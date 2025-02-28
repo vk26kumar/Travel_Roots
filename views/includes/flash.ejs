@@ -1,0 +1,56 @@
+<br>
+<style>
+    .flash-container {
+        position: fixed;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 50%;
+        z-index: 1050;
+    }
+
+    .alert {
+        text-align: center;
+        font-size: 16px;
+        padding: 12px;
+    }
+    #flash-message{
+        display: none; 
+        color: red; 
+        font-weight: bold; 
+        margin-top: 10px;
+        margin-bottom: 5px;
+    }
+</style>
+
+<!-- flash message no no listing in category -->
+<div 
+id="flash-message" ></div>
+
+
+
+<% if(success && success.length){ %>
+    <div 
+    class="alert alert-success alert-dismissible fade show col-6 offset-3" 
+    role="alert">
+        <%= success %>
+        <button 
+        type="button" 
+        class="btn-close" 
+        data-bs-dismiss="alert" 
+        aria-label="Close"></button>
+    </div>
+<% } %>
+
+<% if(error && error.length){ %>
+    <div 
+    class="alert alert-danger alert-dismissible fade show col-6 offset-3" 
+    role="alert">
+        <%= error %>
+        <button 
+        type="button" 
+        class="btn-close" 
+        data-bs-dismiss="alert" 
+        aria-label="Close"></button>
+    </div>
+<% } %>

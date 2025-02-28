@@ -1,0 +1,104 @@
+<style>
+.btn-search {
+  background-color: #fe424d;
+  color: #fff;
+  border-radius: 25px;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Adds spacing between icon and text */
+  border: none;
+}
+.btn-search:hover {
+  background-color: #fe424d;
+  color: #fff;
+}
+.btn-search i {
+  margin: 0; /* Remove margin */
+}
+.search-inp{
+  border-radius: 20px;
+  padding:0.5rem 3rem 0.5rem 3rem;
+  font-size:1rem;
+}
+.travel{
+  font-family: sans-serif;
+  color:rgb(225, 50, 50);
+  padding-top: -2px;
+  margin-left: 2px;
+  display: flex;
+  display: inline;
+}
+.search-inp {
+  border-radius: 20px;
+  padding: 0.5rem 3rem 0.5rem 1rem; /* Adjust left padding to move text left */
+  font-size: 1rem;
+  text-align: left; /* Ensures text aligns left */
+}
+
+</style>
+
+<nav class="navbar navbar-expand-md bg-body-tertiary border-bottom sticky-top ">
+    <div class="container-fluid">
+      <span>
+        <a class="navbar-brand" href="/listings"><i class="fa-regular fa-compass ms-auto"><h3 class="travel">Travel Roots</h3></i></a>
+      </span>
+      
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+
+
+
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-link" href="/listings"><b>Explore</b></a>
+        </div>
+
+
+
+        <div class="navbar-nav ms-auto">
+          <form class="d-flex" role="search" action="/listings" method="GET">
+              <input 
+                  class="form-control me-2 search-inp" 
+                  type="search" 
+                  name="search"  
+                  id="searchInput" 
+                  placeholder="Search by Location"
+                  value="<%= searchQuery %>">
+              <button class="btn btn-search" type="submit">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  Search
+              </button>
+          </form>
+      </div>
+      
+
+        
+
+        <div class="navbar-nav ms-auto">
+          <a class="nav-link" href="/listings/new"><b>Add your place</b></a>
+          <% if(!currUser) { %>
+            <a class="nav-link " aria-current="page" href="/signup"><b>Signup</b></a>
+            <a class="nav-link " aria-current="page" href="/signup"><b>Login</b></a>
+          <% } %>
+          <% if(currUser) { %>
+          <a class="nav-link" href="/logout "><b>Logout</b></a>
+          <i class="fa-solid fa-circle-user fa-2x"></i>
+          <% } %>
+          
+        </div>
+        
+      </div>
+      
+  </div>
+</nav>
+
+
+
+
+
+
+
