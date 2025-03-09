@@ -54,4 +54,11 @@ router.get("/:id/edit",
 ); 
 
 
+// BOOK ROUTE
+router.get("/:id/book",
+    isLoggedIn, 
+    wrapAsync (listingController.bookListing)
+); 
+
+
 module.exports = router;

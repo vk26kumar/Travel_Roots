@@ -54,7 +54,7 @@ module.exports.showListing = async(req,res)=>{
 
 // CREATE ROUTE
 module.exports.createListing = async(req,res, next)=>{
-    let { location, category } = req.body.listing;
+    let { location, category, email, phone } = req.body.listing;
     let url = req.file.path;
     let filename = req.file.filename;
     const geoUrl = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(location)}&apiKey=${geoApiKey}`;
@@ -74,6 +74,8 @@ module.exports.createListing = async(req,res, next)=>{
         image: { url, filename },
         coordinates, // Save coordinates in the database
         category,
+        email,
+        phone,
     });
 
     await newListing.save(); 
@@ -124,4 +126,15 @@ module.exports.deleteListing = async(req,res)=>{
     await Listing.findByIdAndDelete(id);
     req.flash("success", "Listing deleted successfully");
     res.redirect("/listings");
+};
+
+//BOOK ROUTE
+module.exports.bookListing = async (req, res) => {
+    let { id } = req.params;
+    let listing = await Listing.findById(id); 
+    if (!listing) {
+        req.flash("error", "Listing not found!");
+        return res.redirect("/listings");
+    }
+    res.render("listing/book", { listing }); 
 };

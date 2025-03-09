@@ -98,7 +98,31 @@
                         </div>
                     </div>
 
-                    <div class="mb-3 col-md-8">
+                    <div class="mb-3 col-md-8 col-12">
+                        <label for="country" class="form-label">Phone</label>
+                        <input 
+                        name="listing[phone]" 
+                        value="<%= listing.phone %>"
+                        type="Number" 
+                        class="form-control" required>
+                        <div class="invalid-feedback">
+                            Enter valid phone number.
+                        </div>
+                    </div>
+    
+                    <div class="mb-3">
+                        <label for="country" class="form-label">Email</label>
+                        <input 
+                        name="listing[email]" 
+                        value="<%= listing.email %>" 
+                        type="email" 
+                        class="form-control" required>
+                        <div class="invalid-feedback">
+                            Enter valid Email id.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
                         <label for="country" class="form-label">Country</label>
                         <input 
                         name="listing[country]" 
