@@ -4,7 +4,7 @@ const passport = require("passport");
 const wrapAsync = require("../utlity/wrapAsync.js");
 const { saveRedirectUrl }  = require("../middleware.js");
 const userControllers = require("../controllers/user.js")
-
+const Booking = require("../models/booking");
 
 
 // Render Signup/Login Page (GET /signup)
@@ -19,6 +19,21 @@ router.post(
     saveRedirectUrl,
     wrapAsync(userControllers.signup)
 );
+
+router.get("/dashboard", async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.redirect("/login");
+    }
+
+    const bookings = await Booking.find({ user: req.user._id })
+        .populate("listing")
+        .sort({ createdAt: -1 });
+
+    res.render("users/dashboard", {
+        user: req.user,
+        bookings
+    });
+});
 
 // Handle Login (POST /login)
 router.post(

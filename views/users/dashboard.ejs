@@ -1,0 +1,49 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container dashboard-container">
+
+    <h2 class="page-title">My Dashboard</h2>
+
+    <!-- USER INFO -->
+    <div class="dashboard-card">
+        <h4>Profile Information</h4>
+
+        <p><strong>Username:</strong> <%= user.username %></p>
+        <p><strong>Email:</strong> <%= user.email %></p>
+
+        <% if (user.phone) { %>
+            <p><strong>Phone:</strong> <%= user.phone %></p>
+        <% } else { %>
+            <p><strong>Phone:</strong> Not provided</p>
+        <% } %>
+    </div>
+
+    <!-- BOOKINGS -->
+    <div class="dashboard-card">
+        <h4>My Bookings</h4>
+
+        <% if (bookings.length === 0) { %>
+            <p>No bookings yet.</p>
+        <% } else { %>
+            <% bookings.forEach(b => { %>
+                <div class="booking-item">
+                    <h5><%= b.listing.title %></h5>
+                    <p><%= b.listing.location %></p>
+                    <p>
+                        <strong><%= b.fromDate %></strong> → 
+                        <strong><%= b.toDate %></strong>
+                    </p>
+                    <p>
+                        ₹ <%= b.amount %> |
+                        <span class="paid"><%= b.status %></span>
+                    </p>
+
+                    <a href="/bookings/<%= b._id %>/success" class="btn btn-outline-success btn-sm">
+                        View Receipt
+                    </a>
+                </div>
+            <% }) %>
+        <% } %>
+    </div>
+
+</div>

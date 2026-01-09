@@ -295,3 +295,32 @@ body{
     margin-top: 0.5rem;
     font-weight: 500;
 }
+
+
+/* Dashbrad profile css */
+.dashboard-container {
+    max-width: 900px;
+    margin: 3rem auto;
+}
+
+.dashboard-card {
+    background: #fff;
+    padding: 1.8rem;
+    border-radius: 14px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.booking-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.booking-item:last-child {
+    border-bottom: none;
+}
+
+.paid {
+    color: green;
+    font-weight: 600;
+}
