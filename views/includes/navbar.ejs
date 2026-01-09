@@ -1,39 +1,108 @@
 <style>
+.navbar {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  padding: 0.6rem 1.2rem;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.navbar-brand i {
+  display: flex;
+  align-items: center;
+  font-size: 1.6rem;
+  color: #fe424d;
+}
+
+.travel {
+  display: inline;
+  font-family: "Inter", system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.4rem;
+  color: #fe424d;
+  margin: 0;
+  line-height: 1;
+}
+
+.navbar-nav .nav-link {
+  font-weight: 600;
+  color: #2d2d2d;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  transition: all 0.25s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  background: rgba(254, 66, 77, 0.12);
+  color: #fe424d;
+}
+
+form[role="search"] {
+  background: #fff;
+  padding: 0.25rem;
+  border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+}
+
+.search-inp {
+  border: none;
+  outline: none;
+  border-radius: 999px;
+  padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+  width: 220px;
+}
+
 .btn-search {
   background-color: #fe424d;
   color: #fff;
-  border-radius: 25px;
-  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  padding: 0.55rem 1.3rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem; /* Adds spacing between icon and text */
+  gap: 0.45rem;
+  font-weight: 600;
   border: none;
+  transition: all 0.25s ease;
 }
+
 .btn-search:hover {
   background-color: #fe424d;
-  color: #fff;
+  box-shadow: 0 8px 20px rgba(254, 66, 77, 0.45);
+  transform: translateY(-1px);
 }
-.btn-search i {
-  margin: 0; /* Remove margin */
+
+.fa-circle-user {
+  color: #fe424d;
+  margin-left: 0.6rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
-.search-inp{
-  border-radius: 20px;
-  padding:0.5rem 3rem 0.5rem 3rem;
-  font-size:1rem;
+
+.fa-circle-user:hover {
+  transform: scale(1.15);
 }
-.travel{
-  font-family: sans-serif;
-  color:rgb(225, 50, 50);
-  padding-top: -2px;
-  margin-left: 2px;
+
+.navbar-toggler {
+  border: none;
+}
+
+.navbar-toggler:focus {
+  box-shadow: none;
+}
+
+.navbar-nav.ms-auto {
   display: flex;
-  display: inline;
-}
-.search-inp {
-  border-radius: 20px;
-  padding: 0.5rem 3rem 0.5rem 1rem; /* Adjust left padding to move text left */
-  font-size: 1rem;
-  text-align: left; /* Ensures text aligns left */
+  align-items: center;
+  gap: 0.4rem;
 }
 
 </style>

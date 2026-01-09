@@ -60,5 +60,11 @@ router.get("/:id/book",
     wrapAsync (listingController.bookListing)
 ); 
 
+router.get("/:id/success", async (req, res) => {
+    const { id } = req.params;
+    const listing = await Listing.findById(id);
+    res.render("listing/success", { listing });
+});
+
 
 module.exports = router;

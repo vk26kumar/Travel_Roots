@@ -35,16 +35,19 @@
         </ul><br><br>
 
         <div class="btns text-center">
-            <a href="/listings/<%= listing._id %>/edit">
-                <button class="btn btn-danger btn-show">Edit</button>
-            </a>
-            <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" class="d-inline">
-                <button class="btn btn-danger btn-show">Delete</button>
-            </form> 
-            <form method="GET" action="/listings/<%= listing._id %>/book" class="d-inline">
-                <button class="btn btn-success btn-show">Book Now</button>
-            </form>
-        </div>
+    <a href="/listings/<%= listing._id %>/edit">
+        <button class="btn btn-danger btn-show">Edit</button>
+    </a>
+
+    <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" class="d-inline">
+        <button class="btn btn-danger btn-show">Delete</button>
+    </form> 
+
+    <a href="/listings/<%= listing._id %>/book" class="btn btn-success btn-show">
+        Book Now
+    </a>
+</div>
+
 
 
         <!-- //Review  -->

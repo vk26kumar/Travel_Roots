@@ -1,0 +1,78 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container receipt-container">
+
+    <div class="receipt-card" id="receipt">
+
+        <h1 class="success-title">🎉 Booking Confirmed</h1>
+        <p class="success-sub">Your payment was successful. Thank you for booking with Travel Roots.</p>
+
+        <hr>
+
+        <h3 class="section-title">Booking Details</h3>
+
+        <div class="detail-row">
+            <span>Hotel / Listing</span>
+            <strong><%= listing.title %></strong>
+        </div>
+
+        <div class="detail-row">
+            <span>Location</span>
+            <strong><%= listing.location %></strong>
+        </div>
+
+        <div class="detail-row">
+            <span>Check-in Date</span>
+            <strong><%= booking.fromDate %></strong>
+        </div>
+
+        <div class="detail-row">
+            <span>Check-out Date</span>
+            <strong><%= booking.toDate %></strong>
+        </div>
+
+        <div class="detail-row">
+            <span>Total Nights</span>
+            <strong><%= booking.nights %></strong>
+        </div>
+
+        <hr>
+
+        <h3 class="section-title">Payment Details</h3>
+
+        <div class="detail-row">
+            <span>Price per Night</span>
+            <strong>₹ <%= listing.price %></strong>
+        </div>
+
+        <div class="detail-row total">
+            <span>Total Amount Paid</span>
+            <strong>₹ <%= booking.amount %></strong>
+        </div>
+
+        <div class="detail-row">
+            <span>Transaction ID</span>
+            <strong><%= booking.paymentId %></strong>
+        </div>
+
+        <div class="detail-row">
+            <span>Payment Status</span>
+            <strong class="paid">PAID</strong>
+        </div>
+
+        <hr>
+
+        <p class="secure-text">🔒 Payment secured by Razorpay</p>
+    </div>
+
+    <div class="receipt-actions">
+        <button onclick="window.print()" class="btn btn-outline-dark">
+            Download / Print Receipt
+        </button>
+
+        <a href="/listings/<%= listing._id %>" class="btn btn-success">
+            Go Back to Listing
+        </a>
+    </div>
+
+</div>

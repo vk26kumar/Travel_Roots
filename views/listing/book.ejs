@@ -1,10 +1,182 @@
 <% layout("/layouts/boilerplate") %>
-<br>
-<h2 style="color:red"><i><b>*For  booking, contact the owner from given Information:-</b></i></h2><br>
-<h3>
-    <ul>
-        <li>Phone Number:- <%= listing.phone %></li>
-        <li>Email id:- <%= listing.email %></li>
-    </ul>
-</h3><br>
-<h1 style="color: green"><u><b>Thanku you for visiting.</b></u>😊</h1>
+
+<div class="container booking-container">
+
+    <h2 class="page-title">Confirm Your Booking</h2>
+
+    <div class="booking-grid">
+
+        <!-- LEFT : LISTING DETAILS -->
+        <div class="booking-card">
+            <h3 class="section-title">Listing Details</h3>
+
+            <div class="detail-row">
+                <span>Title</span>
+                <strong><%= listing.title %></strong>
+            </div>
+
+            <div class="detail-row">
+                <span>Location</span>
+                <strong><%= listing.location %></strong>
+            </div>
+
+            <div class="detail-row">
+                <span>Price / Night</span>
+                <strong>₹ <span id="pricePerNight"><%= listing.price %></span></strong>
+            </div>
+
+            <div class="divider"></div>
+
+            <h4 class="sub-title">Select Dates</h4>
+
+            <div class="date-group">
+                <label>Check-in</label>
+                <input type="date" id="fromDate">
+            </div>
+
+            <div class="date-group">
+                <label>Check-out</label>
+                <input type="date" id="toDate">
+            </div>
+
+            <p class="nights-text">
+                Nights: <strong><span id="totalNights">0</span></strong>
+            </p>
+
+            <div class="divider"></div>
+
+            <h4 class="sub-title">Owner Contact</h4>
+            <p>📞 <%= listing.phone %></p>
+            <p>✉️ <%= listing.email %></p>
+        </div>
+
+        <!-- RIGHT : PAYMENT SUMMARY -->
+        <div class="booking-card highlight">
+            <h3 class="section-title">Payment Summary</h3>
+
+            <div class="detail-row">
+                <span>Price per Night</span>
+                <strong>₹ <%= listing.price %></strong>
+            </div>
+
+            <div class="detail-row">
+                <span>Total Nights</span>
+                <strong><span id="summaryNights">0</span></strong>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="detail-row total">
+                <span>Total Amount</span>
+                <strong>₹ <span id="totalAmount">0</span></strong>
+            </div>
+
+            <button id="rzp-button1" class="pay-btn" disabled>
+                Confirm & Pay
+            </button>
+
+            <p class="secure-text">
+                🔒 Secure payment powered by Razorpay
+            </p>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const pricePerNight = <%= listing.price %>;
+    const fromDate = document.getElementById("fromDate");
+    const toDate = document.getElementById("toDate");
+    const totalNightsEl = document.getElementById("totalNights");
+    const summaryNightsEl = document.getElementById("summaryNights");
+    const totalAmountEl = document.getElementById("totalAmount");
+    const payBtn = document.getElementById("rzp-button1");
+
+    let totalAmount = 0;
+
+    function calculateBooking() {
+        if (!fromDate.value || !toDate.value) return;
+
+        const start = new Date(fromDate.value);
+        const end = new Date(toDate.value);
+
+        const diffTime = end - start;
+        const nights = diffTime / (1000 * 60 * 60 * 24);
+
+        if (nights <= 0) {
+            totalNightsEl.innerText = 0;
+            summaryNightsEl.innerText = 0;
+            totalAmountEl.innerText = 0;
+            payBtn.disabled = true;
+            return;
+        }
+
+        totalAmount = nights * pricePerNight;
+
+        totalNightsEl.innerText = nights;
+        summaryNightsEl.innerText = nights;
+        totalAmountEl.innerText = totalAmount;
+        payBtn.disabled = false;
+    }
+
+    fromDate.addEventListener("change", calculateBooking);
+    toDate.addEventListener("change", calculateBooking);
+
+    payBtn.onclick = async function () {
+
+        const res = await fetch("/payment/create-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount: totalAmount })
+        });
+
+        const order = await res.json();
+
+        const options = {
+            key: "<%= process.env.RAZORPAY_KEY_ID %>",
+            amount: order.amount,
+            currency: "INR",
+            name: "Travel Roots",
+            description: "Listing Booking",
+            order_id: order.id,
+            prefill: {
+                name: "<%= currUser?.username || '' %>",
+                email: "<%= currUser?.email || '' %>",
+                contact: "<%= listing.phone %>"
+            },
+            handler: async function (response) {
+
+                const verify = await fetch("/payment/verify", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature,
+                        listingId: "<%= listing._id %>",
+                        fromDate: fromDate.value,
+                        toDate: toDate.value,
+                        nights: summaryNightsEl.innerText,
+                        amount: totalAmount
+                    })
+                });
+
+                const result = await verify.json();
+
+                if (result.success) {
+                    window.location.href = `/bookings/${result.bookingId}/success`;
+                } else {
+                    alert("Payment verification failed");
+                }
+            },
+            theme: { color: "#fe424d" }
+        };
+
+        new Razorpay(options).open();
+    };
+});
+</script>
