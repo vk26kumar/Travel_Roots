@@ -2,6 +2,7 @@ const Listing = require("./models/listing.js");
 const Review = require("./models/review.js");
 const ExpressError = require("./utlity/ExpressError.js");
 const {listingSchema, reviewSchema} = require("./schema.js");
+const Booking = require("./models/booking.js");
 
 
 // VALIDATE FUNCTION FOR Listing
@@ -36,9 +37,6 @@ module.exports.isLoggedIn = (req,res,next)=>{
     next();
 }; 
 
-
-
-
 // TO STOR LOCAL ADDRESS OF USER WHERE USER IS TRYING TO RECH BEFORE LOGIN OR SIGNUP
 module.exports.saveRedirectUrl = (req, res, next) => {
     if(req.session.redirectUrl){
@@ -69,3 +67,26 @@ module.exports.isReviewAuthor = async (req, res, next)=>{
     }
     next();
 }
+
+// TO CHECK THAT USER IS OWNER OF THAT BOOKING OR NOT
+module.exports.isBookingOwner = async (req, res, next) => {
+    let { id } = req.params;
+
+    if (!req.isAuthenticated()) {
+        req.flash("error", "You must be logged in to view this booking.");
+        return res.redirect("/signup");
+    }
+
+    let booking = await Booking.findById(id);
+
+    if (!booking) {
+        throw new ExpressError(404, "Booking not found");
+    }
+
+    if (!booking.user.equals(res.locals.currUser._id)) {
+        req.flash("error", "You are not authorized to view this booking.");
+        return res.redirect("/dashboard");
+    }
+
+    next();
+};
