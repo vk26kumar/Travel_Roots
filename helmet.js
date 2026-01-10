@@ -46,14 +46,29 @@ module.exports = helmet({
 
       connectSrc: [
         "'self'",
+
+        // Razorpay
         "https://api.razorpay.com",
+        "https://checkout.razorpay.com",
+        "https://lumberjack.razorpay.com",
+
+        // Google
         "https://accounts.google.com",
-        "https://github.com",
-        "https://*.tile.openstreetmap.org"
+
+        // CDNs 
+        "https://cdn.jsdelivr.net",
+        "https://unpkg.com",
+
+        // Maps
+        "https://*.tile.openstreetmap.org",
+
+        // GitHub OAuth / avatars
+        "https://github.com"
       ],
 
       frameSrc: [
         "https://checkout.razorpay.com",
+        "https://api.razorpay.com",
         "https://accounts.google.com"
       ]
     }
