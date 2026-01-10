@@ -79,10 +79,7 @@ body{
 .card-text p{
     font-weight:400 !important;
 }
-.listing-link{
-    display: block;
-    text-decoration: none;
-}
+
 
 
 /* card effect */
@@ -150,12 +147,15 @@ body{
 
 
 /* category proper aligment */
-.listings-grid {
+.row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 
+
+.listing-link{
+    text-decoration: none;
+}
 
 /* front page category icon  */
 #filters {
