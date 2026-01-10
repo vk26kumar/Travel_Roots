@@ -4,6 +4,12 @@ if (process.env.NODE_ENV != "production") {
 
 const express = require("express");
 const app = express();
+
+//Webhook must be FIRST
+const webhookRoutes = require("./routes/webhook");
+app.use("/webhook", webhookRoutes);
+
+
 const path = require("path");
 const methodOverride = require("method-override");
 const mongoose = require("mongoose");
@@ -20,6 +26,8 @@ const User = require("./models/user.js");
 const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
+const paymentRoutes = require("./routes/payment");
+const bookingRoutes = require("./routes/booking");
 require("./init/passport.js");
 
 const dbUrl = process.env.ATLASDB_URL;
@@ -116,7 +124,6 @@ app.get(
     }
 );
 
-
 app.get("/", (req, res) => {
     res.redirect("/listings");
 });
@@ -124,12 +131,7 @@ app.get("/", (req, res) => {
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
-
-
-const paymentRoutes = require("./routes/payment");
 app.use("/payment", paymentRoutes);
-
-const bookingRoutes = require("./routes/booking");
 app.use("/bookings", bookingRoutes);
 
 
