@@ -1,39 +1,40 @@
 <style>
+/* ===== NAVBAR CORE ===== */
 .navbar {
-  background: rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(14px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  padding: 0.6rem 1.2rem;
+  background: rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  padding: 0.65rem 1.4rem;
+  font-family: "Inter", system-ui, sans-serif;
 }
 
+/* ===== BRAND ===== */
 .navbar-brand {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  white-space: nowrap;
+  gap: 0.55rem;
+  font-weight: 800;
+  text-decoration: none;
 }
 
 .navbar-brand i {
-  display: flex;
-  align-items: center;
   font-size: 1.6rem;
   color: #fe424d;
 }
 
 .travel {
-  display: inline;
-  font-family: "Inter", system-ui, sans-serif;
+  font-size: 1.45rem;
   font-weight: 800;
-  font-size: 1.4rem;
   color: #fe424d;
   margin: 0;
-  line-height: 1;
+  letter-spacing: -0.4px;
 }
 
+/* ===== NAV LINKS ===== */
 .navbar-nav .nav-link {
   font-weight: 600;
-  color: #2d2d2d;
-  padding: 0.45rem 0.9rem;
+  color: #2b2b2b;
+  padding: 0.45rem 0.95rem;
   border-radius: 999px;
   transition: all 0.25s ease;
 }
@@ -41,13 +42,15 @@
 .navbar-nav .nav-link:hover {
   background: rgba(254, 66, 77, 0.12);
   color: #fe424d;
+  transform: translateY(-1px);
 }
 
+/* ===== SEARCH BAR ===== */
 form[role="search"] {
   background: #fff;
-  padding: 0.25rem;
+  padding: 0.3rem;
   border-radius: 999px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
   display: flex;
   align-items: center;
 }
@@ -55,42 +58,47 @@ form[role="search"] {
 .search-inp {
   border: none;
   outline: none;
-  border-radius: 999px;
   padding: 0.6rem 1rem;
   font-size: 0.95rem;
+  border-radius: 999px;
   width: 220px;
 }
 
+.search-inp::placeholder {
+  color: #aaa;
+}
+
 .btn-search {
-  background-color: #fe424d;
+  background: linear-gradient(135deg, #fe424d, #ff6b73);
   color: #fff;
   border-radius: 999px;
-  padding: 0.55rem 1.3rem;
+  padding: 0.55rem 1.35rem;
+  font-weight: 600;
+  border: none;
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  font-weight: 600;
-  border: none;
   transition: all 0.25s ease;
 }
 
 .btn-search:hover {
-  background-color: #fe424d;
-  box-shadow: 0 8px 20px rgba(254, 66, 77, 0.45);
+  box-shadow: 0 10px 25px rgba(254, 66, 77, 0.45);
   transform: translateY(-1px);
 }
 
+/* ===== PROFILE ICON ===== */
 .fa-circle-user {
   color: #fe424d;
   margin-left: 0.6rem;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: transform 0.25s ease;
 }
 
 .fa-circle-user:hover {
   transform: scale(1.15);
 }
 
+/* ===== TOGGLER ===== */
 .navbar-toggler {
   border: none;
 }
@@ -99,18 +107,39 @@ form[role="search"] {
   box-shadow: none;
 }
 
+/* ===== ALIGNMENT ===== */
 .navbar-nav.ms-auto {
   display: flex;
   align-items: center;
   gap: 0.4rem;
 }
 
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+  form[role="search"] {
+    width: 100%;
+    margin: 0.8rem 0;
+  }
+
+  .search-inp {
+    width: 100%;
+  }
+
+  .navbar-nav {
+    gap: 0.5rem;
+  }
+}
+
+
 </style>
 
 <nav class="navbar navbar-expand-md bg-body-tertiary border-bottom sticky-top ">
     <div class="container-fluid">
       <span>
-        <a class="navbar-brand" href="/listings"><i class="fa-regular fa-compass ms-auto"><h3 class="travel">Travel Roots</h3></i></a>
+        <a class="navbar-brand" href="/listings">
+          <i class="fa-regular fa-compass"></i>
+          <span class="travel">Travel Roots</span>
+        </a>
       </span>
       
 

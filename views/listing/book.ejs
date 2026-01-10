@@ -46,8 +46,8 @@
             <div class="divider"></div>
 
             <h4 class="sub-title">Owner Contact</h4>
-            <p>📞 <%= listing.phone %></p>
-            <p>✉️ <%= listing.email %></p>
+            <p>📞 <%= listing.phone || "+91-7800982247" %></p>
+            <p>✉️ <%= listing.email || "contact@travelroots.com" %></p>
         </div>
 
         <!-- RIGHT : PAYMENT SUMMARY -->
@@ -98,20 +98,37 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let totalAmount = 0;
 
+    // ✅ TODAY DATE (yyyy-mm-dd)
+    const today = new Date();
+    const todayStr = today.toISOString().split("T")[0];
+
+    // ✅ Prevent past date selection
+    fromDate.setAttribute("min", todayStr);
+    toDate.setAttribute("min", todayStr);
+
     function calculateBooking() {
-        if (!fromDate.value || !toDate.value) return;
+        if (!fromDate.value) return;
 
-        const start = new Date(fromDate.value);
-        const end = new Date(toDate.value);
+        // ✅ Checkout must be at least 1 day after check-in
+        const checkIn = new Date(fromDate.value);
+        const minCheckout = new Date(checkIn);
+        minCheckout.setDate(minCheckout.getDate() + 1);
+        const minCheckoutStr = minCheckout.toISOString().split("T")[0];
+        toDate.setAttribute("min", minCheckoutStr);
 
-        const diffTime = end - start;
-        const nights = diffTime / (1000 * 60 * 60 * 24);
+        if (!toDate.value) {
+            resetValues();
+            return;
+        }
 
-        if (nights <= 0) {
-            totalNightsEl.innerText = 0;
-            summaryNightsEl.innerText = 0;
-            totalAmountEl.innerText = 0;
-            payBtn.disabled = true;
+        const checkOut = new Date(toDate.value);
+
+        // ✅ Calculate nights
+        const diffTime = checkOut - checkIn;
+        const nights = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+        if (nights < 1) {
+            resetValues();
             return;
         }
 
@@ -123,7 +140,19 @@ document.addEventListener("DOMContentLoaded", function () {
         payBtn.disabled = false;
     }
 
-    fromDate.addEventListener("change", calculateBooking);
+    function resetValues() {
+        totalNightsEl.innerText = 0;
+        summaryNightsEl.innerText = 0;
+        totalAmountEl.innerText = 0;
+        payBtn.disabled = true;
+    }
+
+    fromDate.addEventListener("change", () => {
+        toDate.value = ""; // reset checkout on change
+        resetValues();
+        calculateBooking();
+    });
+
     toDate.addEventListener("change", calculateBooking);
 
     payBtn.onclick = async function () {
@@ -159,9 +188,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         razorpay_signature: response.razorpay_signature,
                         listingId: "<%= listing._id %>",
                         fromDate: fromDate.value,
-                        toDate: toDate.value,
-                        nights: summaryNightsEl.innerText,
-                        amount: totalAmount
+                        toDate: toDate.value
                     })
                 });
 
@@ -180,3 +207,4 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 });
 </script>
+

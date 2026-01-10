@@ -5,6 +5,13 @@ const wrapAsync = require("../utlity/wrapAsync.js");
 const { saveRedirectUrl }  = require("../middleware.js");
 const userControllers = require("../controllers/user.js")
 const Booking = require("../models/booking");
+const rateLimit = require("express-rate-limit");
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, 
+    max: 20, 
+    message: "Too many login/signup attempts. Please try again later."
+});
 
 
 // Render Signup/Login Page (GET /signup)
@@ -16,6 +23,7 @@ router.get("/signup", (req, res) => {
 // Handle User Registration (POST /signup)
 router.post(
     "/signup",
+    authLimiter,
     saveRedirectUrl,
     wrapAsync(userControllers.signup)
 );
@@ -38,6 +46,7 @@ router.get("/dashboard", async (req, res) => {
 // Handle Login (POST /login)
 router.post(
     "/login",
+    authLimiter,
     saveRedirectUrl,
     passport.authenticate("local", {
         failureRedirect: "/signup",

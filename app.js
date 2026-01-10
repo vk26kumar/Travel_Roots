@@ -9,6 +9,16 @@ const app = express();
 const webhookRoutes = require("./routes/webhook");
 app.use("/webhook", webhookRoutes);
 
+// Rate Limiting Middleware
+const rateLimit = require("express-rate-limit");
+
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,                
+    message: "Too many requests, please try again later."
+});
+
+
 
 const path = require("path");
 const methodOverride = require("method-override");
@@ -131,7 +141,7 @@ app.get("/", (req, res) => {
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
-app.use("/payment", paymentRoutes);
+app.use("/payment",apiLimiter, paymentRoutes);
 app.use("/bookings", bookingRoutes);
 
 
