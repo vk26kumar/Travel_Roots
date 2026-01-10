@@ -27,7 +27,7 @@ router.post("/verify", async (req, res) => {
         toDate
     } = req.body;
 
-    // 1️⃣ Verify Razorpay signature
+    //Verify Razorpay signature
     const body = razorpay_order_id + "|" + razorpay_payment_id;
 
     const expectedSignature = crypto
@@ -39,13 +39,13 @@ router.post("/verify", async (req, res) => {
         return res.status(400).json({ success: false });
     }
 
-    // 2️⃣ Fetch listing from DB
+    //Fetch listing from DB
     const listing = await Listing.findById(listingId);
     if (!listing) {
         return res.status(404).json({ success: false });
     }
 
-    // 3️⃣ Parse & normalize dates
+    //Parse & normalize dates
     const start = new Date(fromDate);
     const end = new Date(toDate);
 
@@ -55,19 +55,19 @@ router.post("/verify", async (req, res) => {
     const diffMs = end - start;
     const nights = diffMs / (1000 * 60 * 60 * 24);
 
-    // 4️⃣ Backend validations
+    //Backend validations
     if (nights < 1) {
         return res.status(400).json({ success: false });
     }
 
-    // 5️⃣ Recalculate amount (DO NOT TRUST FRONTEND)
+    //Recalculate amount (DO NOT TRUST FRONTEND)
     const amount = nights * listing.price;
 
     if (amount <= 0) {
         return res.status(400).json({ success: false });
     }
 
-    // 6️⃣ Save booking
+    //Save booking
     const booking = new Booking({
         listing: listingId,
         user: req.user._id,
