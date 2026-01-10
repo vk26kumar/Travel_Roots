@@ -16,6 +16,8 @@ module.exports = helmet({
         "https://unpkg.com"
       ],
 
+      scriptSrcAttr: ["'unsafe-inline'"],
+
       styleSrc: [
         "'self'",
         "'unsafe-inline'",
