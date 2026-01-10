@@ -10,60 +10,9 @@ const webhookRoutes = require("./routes/webhook");
 app.use("/webhook", webhookRoutes);
 const helmet = require("helmet");
 
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-
-        scriptSrc: [
-          "'self'",
-          "'unsafe-inline'",
-          "https://checkout.razorpay.com",
-          "https://cdn.jsdelivr.net",
-          "https://code.jquery.com",
-          "https://accounts.google.com",   
-          "https://github.com"             
-        ],
-
-        styleSrc: [
-          "'self'",
-          "'unsafe-inline'",
-          "https://cdn.jsdelivr.net",
-          "https://fonts.googleapis.com"
-        ],
-
-        fontSrc: [
-          "'self'",
-          "https://fonts.gstatic.com"
-        ],
-
-        imgSrc: [
-          "'self'",
-          "data:",
-          "blob:",
-          "https://res.cloudinary.com",
-          "https://images.unsplash.com",
-          "https://lh3.googleusercontent.com",      
-          "https://avatars.githubusercontent.com"  
-        ],
-
-        connectSrc: [
-          "'self'",
-          "https://api.razorpay.com",
-          "https://accounts.google.com",
-          "https://github.com"
-        ],
-
-        frameSrc: [
-          "https://checkout.razorpay.com",
-          "https://accounts.google.com"  
-        ]
-      }
-    }
-  })
-);
-
+// security
+const helmetMiddleware = require("./helmet");
+app.use(helmetMiddleware);
 
 
 // Rate Limiting Middleware
