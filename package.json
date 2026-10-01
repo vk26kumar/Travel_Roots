@@ -44,7 +44,7 @@
     "joi": "^17.13.3",
     "leaflet": "^1.9.4",
     "method-override": "^3.0.0",
-    "mongoose": "^8.24.4",
+    "mongoose": "^9.10.2",
     "morgan": "^1.12.1",
     "multer": "^2.4.0",
     "nodemailer": "^10.0.13",
