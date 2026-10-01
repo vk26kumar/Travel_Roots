@@ -23,6 +23,7 @@
     "format:check": "prettier --check .",
     "test": "node --test --test-concurrency=1 --test-timeout=120000 \"tests/**/*.test.js\"",
     "test:coverage": "node --test --test-concurrency=1 --test-timeout=120000 --experimental-test-coverage \"tests/**/*.test.js\"",
+    "demo": "node scripts/demo.js",
     "seed": "node scripts/seed.js",
     "migrate": "node scripts/migrate.js",
     "audit:prod": "npm audit --omit=dev --audit-level=high"

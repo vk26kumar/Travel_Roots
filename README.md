@@ -155,6 +155,8 @@ npm run seed                # optional: sample listings and a demo host account
 npm run dev                 # http://localhost:8080
 ```
 
+To try the application without any database setup, run `npm run demo`. It starts a temporary in-memory MongoDB with the sample listings and prints the demo host's sign-in details; the data is discarded when the process stops.
+
 Only `ATLASDB_URL` and `SECRET` are needed to start. Each optional integration switches on when its variables are filled in.
 
 ### Run with Docker
@@ -207,6 +209,7 @@ https://<your-domain>/webhook/razorpay
 | ----------------------- | ------------------------------------------------------------- |
 | `npm start`             | Start the server                                              |
 | `npm run dev`           | Start the server and restart on file changes                  |
+| `npm run demo`          | Run locally on a temporary in-memory database with sample listings (no MongoDB needed) |
 | `npm test`              | Run unit and integration tests                                |
 | `npm run test:coverage` | Run tests with a coverage report                              |
 | `npm run lint`          | Lint with ESLint                                              |
@@ -235,7 +238,7 @@ Coverage includes:
 - Reviews and rating summaries, wishlist
 - Server-side booking amounts, overlap protection, payment signature verification, receipt access control and webhooks
 
-Tests never read `.env`, so they cannot reach real payment, OAuth or storage accounts.
+Tests never read `.env`, so they cannot reach real payment, OAuth or storage accounts. Test passwords and signing secrets are generated at runtime by `tests/fixtures.js`, so no credential-like values are committed.
 
 ---
 

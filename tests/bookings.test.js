@@ -7,6 +7,10 @@ const h = require("./helpers");
 const config = require("../src/config");
 const payments = require("../src/services/payments");
 const Booking = require("../src/models/booking");
+const { testSecret } = require("./fixtures");
+
+const KEY_SECRET = testSecret();
+const WEBHOOK_SECRET = testSecret();
 
 function isoDaysFromNow(days) {
   const date = new Date();
@@ -23,8 +27,8 @@ describe("bookings and payments", () => {
     await h.connectDatabase();
     config.features.payments = true;
     config.razorpay.keyId = "rzp_test_key";
-    config.razorpay.keySecret = "test_secret";
-    config.razorpay.webhookSecret = "webhook_secret";
+    config.razorpay.keySecret = KEY_SECRET;
+    config.razorpay.webhookSecret = WEBHOOK_SECRET;
     let counter = 0;
     payments.createOrder = async ({ amountPaise }) => {
       counter += 1;
@@ -103,7 +107,7 @@ describe("bookings and payments", () => {
     assert.equal(forged.status, 400);
 
     const signature = crypto
-      .createHmac("sha256", "test_secret")
+      .createHmac("sha256", KEY_SECRET)
       .update(`${orderId}|pay_1`)
       .digest("hex");
     const verified = await guest.agent
@@ -171,7 +175,7 @@ describe("bookings and payments", () => {
       event: "payment.captured",
       payload: { payment: { entity: { id: "pay_hook", order_id: orderId } } },
     });
-    const signature = crypto.createHmac("sha256", "webhook_secret").update(payload).digest("hex");
+    const signature = crypto.createHmac("sha256", WEBHOOK_SECRET).update(payload).digest("hex");
 
     const hook = await h
       .request(app)

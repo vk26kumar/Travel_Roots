@@ -7,6 +7,7 @@ const request = require("supertest");
 const { createApp } = require("../src/app");
 const User = require("../src/models/user");
 const Listing = require("../src/models/listing");
+const { testPassword } = require("./fixtures");
 
 let memoryServer = null;
 
@@ -66,7 +67,7 @@ async function signUp(app, overrides = {}) {
   const credentials = {
     username: `traveller${userCounter}`,
     email: `traveller${userCounter}@example.com`,
-    password: "Secret123",
+    password: testPassword(),
     ...overrides,
   };
   const agent = request.agent(app);

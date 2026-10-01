@@ -25,6 +25,7 @@ Thank you for taking the time to contribute.
 - Never trust input from the browser. Validate it with Joi and recompute anything security- or money-related on the server.
 - Browser scripts live in `public/js` and are loaded as files. Inline scripts are blocked by the Content Security Policy.
 - Templates must escape user content with `<%= %>`. Use `<%- %>` only for trusted includes.
+- Never commit credentials. In tests, generate passwords and secrets with the helpers in `tests/fixtures.js` instead of writing literals.
 - Do not use emoji in code, templates, commit messages or documentation.
 
 ## Commit messages

@@ -39,16 +39,9 @@ async function findOrCreateDemoHost() {
   return { user, password };
 }
 
-async function main() {
-  const args = new Set(process.argv.slice(2));
-  if (config.isProduction && !args.has("--force")) {
-    throw new Error("Refusing to seed a production database. Pass --force if you are certain.");
-  }
-
-  await mongoose.connect(config.db.url);
-  console.log(`Connected to ${mongoose.connection.host}/${mongoose.connection.name}`);
-
-  if (args.has("--reset")) {
+/** Inserts the sample listings. Expects an open Mongoose connection. */
+async function seed({ reset = false } = {}) {
+  if (reset) {
     await Promise.all([Listing.deleteMany({}), Review.deleteMany({}), Booking.deleteMany({})]);
     console.log("Removed all listings, reviews and bookings.");
   }
@@ -66,11 +59,27 @@ async function main() {
 
   console.log(`Inserted ${listings.length} listings owned by "${DEMO_USERNAME}".`);
   if (password) console.log(`Demo host password: ${password}`);
+  return { username: DEMO_USERNAME, password };
 }
 
-main()
-  .catch((error) => {
-    console.error(error.message);
-    process.exitCode = 1;
-  })
-  .finally(() => mongoose.disconnect());
+async function main() {
+  const args = new Set(process.argv.slice(2));
+  if (config.isProduction && !args.has("--force")) {
+    throw new Error("Refusing to seed a production database. Pass --force if you are certain.");
+  }
+
+  await mongoose.connect(config.db.url);
+  console.log(`Connected to ${mongoose.connection.host}/${mongoose.connection.name}`);
+  await seed({ reset: args.has("--reset") });
+}
+
+if (require.main === module) {
+  main()
+    .catch((error) => {
+      console.error(error.message);
+      process.exitCode = 1;
+    })
+    .finally(() => mongoose.disconnect());
+}
+
+module.exports = { seed };

@@ -12,6 +12,7 @@ const { clean } = require("../src/middleware/sanitize");
 const config = require("../src/config");
 const payments = require("../src/services/payments");
 const { sessionStoreSecret, meetsStoreComplexity } = require("../src/config/session");
+const { testSecret, complexSecret, simpleSecret } = require("./fixtures");
 
 const NOW = new Date("2026-10-02T10:00:00Z");
 
@@ -107,13 +108,12 @@ describe("request sanitising", () => {
 
 describe("payment signatures", () => {
   it("verifies checkout and webhook signatures", () => {
-    config.razorpay.keySecret = "unit_secret";
-    config.razorpay.webhookSecret = "hook_secret";
+    const keySecret = testSecret();
+    const webhookSecret = testSecret();
+    config.razorpay.keySecret = keySecret;
+    config.razorpay.webhookSecret = webhookSecret;
 
-    const signature = crypto
-      .createHmac("sha256", "unit_secret")
-      .update("order_1|pay_1")
-      .digest("hex");
+    const signature = crypto.createHmac("sha256", keySecret).update("order_1|pay_1").digest("hex");
     assert.ok(
       payments.verifyPaymentSignature({ orderId: "order_1", paymentId: "pay_1", signature }),
     );
@@ -122,7 +122,7 @@ describe("payment signatures", () => {
     );
 
     const body = Buffer.from('{"event":"payment.captured"}');
-    const hook = crypto.createHmac("sha256", "hook_secret").update(body).digest("hex");
+    const hook = crypto.createHmac("sha256", webhookSecret).update(body).digest("hex");
     assert.ok(payments.verifyWebhookSignature(body, hook));
     assert.ok(!payments.verifyWebhookSignature(body, "0".repeat(64)));
   });
@@ -130,13 +130,13 @@ describe("payment signatures", () => {
 
 describe("session store secret", () => {
   it("keeps compliant secrets and strengthens weak ones deterministically", () => {
-    const strong = "Ab-Cd_12";
+    const strong = complexSecret();
     assert.equal(sessionStoreSecret(strong), strong);
 
-    const weak = "all-lowercase-secret-123";
+    const weak = simpleSecret();
     assert.ok(!meetsStoreComplexity(weak));
     assert.ok(meetsStoreComplexity(sessionStoreSecret(weak)));
     assert.equal(sessionStoreSecret(weak), sessionStoreSecret(weak));
-    assert.notEqual(sessionStoreSecret(weak), sessionStoreSecret("another-weak-secret-1"));
+    assert.notEqual(sessionStoreSecret(weak), sessionStoreSecret(simpleSecret()));
   });
 });

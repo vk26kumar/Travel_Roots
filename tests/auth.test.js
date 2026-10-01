@@ -4,6 +4,7 @@ const { describe, it, before, after, beforeEach } = require("node:test");
 const assert = require("node:assert/strict");
 const h = require("./helpers");
 const User = require("../src/models/user");
+const { testPassword } = require("./fixtures");
 
 describe("authentication and profile", () => {
   let app;
@@ -50,7 +51,7 @@ describe("authentication and profile", () => {
     const response = await agent
       .post("/signup")
       .type("form")
-      .send({ username: "a b", email: "x@example.com", password: "short", _csrf: token });
+      .send({ username: "a b", email: "x@example.com", password: "abc", _csrf: token });
     assert.equal(response.headers.location, "/signup");
     assert.equal(await User.countDocuments(), 0);
   });
@@ -65,8 +66,9 @@ describe("authentication and profile", () => {
       return (await agent.get("/login")).text.match(/Invalid username or password/) !== null;
     };
 
-    assert.ok(await attempt(credentials.username, "WrongPass1"));
-    assert.ok(await attempt("nobody-here", "WrongPass1"));
+    const wrongPassword = testPassword();
+    assert.ok(await attempt(credentials.username, wrongPassword));
+    assert.ok(await attempt("nobody-here", wrongPassword));
   });
 
   it("redirects guests to the login page and back afterwards", async () => {
@@ -103,14 +105,15 @@ describe("authentication and profile", () => {
     assert.equal(updated.displayName, "Asha Rao");
     assert.equal(updated.username, credentials.username);
 
+    const nextPassword = testPassword();
     token = h.extractCsrf((await agent.get("/profile/settings")).text);
     await agent.post("/profile/password?_method=PUT").type("form").send({
       _csrf: token,
       currentPassword: credentials.password,
-      newPassword: "BrandNew456",
-      confirmPassword: "BrandNew456",
+      newPassword: nextPassword,
+      confirmPassword: nextPassword,
     });
-    const { user: authenticated } = await User.authenticate()(credentials.username, "BrandNew456");
+    const { user: authenticated } = await User.authenticate()(credentials.username, nextPassword);
     assert.ok(authenticated);
   });
 
