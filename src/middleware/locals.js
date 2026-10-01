@@ -1,7 +1,7 @@
 "use strict";
 
 const config = require("../config");
-const pkg = require("../../package.json");
+const { assetVersion } = require("../utils/assets");
 const helpers = require("../utils/helpers");
 const { CATEGORIES } = require("../utils/constants");
 
@@ -34,7 +34,7 @@ function viewLocals(req, res, next) {
     consent: readConsent(req),
     features: config.features,
     categories: CATEGORIES,
-    assetVersion: pkg.version,
+    assetVersion,
     supportEmail: config.support.email,
     appUrl: config.appUrl,
     taxRate: config.pricing.taxRate,
@@ -46,4 +46,4 @@ function viewLocals(req, res, next) {
   next();
 }
 
-module.exports = { viewLocals, readConsent, CONSENT_COOKIE };
+module.exports = { viewLocals };

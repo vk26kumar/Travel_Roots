@@ -52,4 +52,4 @@ async function sendPasswordReset(user, resetUrl) {
   });
 }
 
-module.exports = { sendMail, sendPasswordReset };
+module.exports = { sendPasswordReset };

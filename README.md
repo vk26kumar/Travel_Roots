@@ -21,6 +21,7 @@ Live site: https://travel-roots.onrender.com
 - [Testing](#testing)
 - [CI/CD pipeline](#cicd-pipeline)
 - [Deployment](#deployment)
+- [Performance](#performance)
 - [Security](#security)
 - [Privacy and cookies](#privacy-and-cookies)
 - [Upgrading from 1.x](#upgrading-from-1x)
@@ -69,7 +70,7 @@ Live site: https://travel-roots.onrender.com
 | -------------- | --------------------------------------------------------------------------- |
 | Runtime        | Node.js 22 or later                                                         |
 | Web framework  | Express 5                                                                   |
-| Views          | EJS with ejs-mate layouts, Bootstrap 5.3, Font Awesome 6, Leaflet           |
+| Views          | EJS with ejs-mate layouts, Bootstrap 5.3 CSS, Leaflet, Lucide icon sprite, Fraunces and Inter (self-hosted) |
 | Database       | MongoDB with Mongoose 8                                                     |
 | Authentication | Passport (local, Google OAuth 2.0, GitHub OAuth), passport-local-mongoose   |
 | Sessions       | express-session with connect-mongo                                          |
@@ -246,10 +247,11 @@ Tests never read `.env`, so they cannot reach real payment, OAuth or storage acc
 
 | Workflow     | Trigger                          | What it does                                                                                       |
 | ------------ | -------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `keepalive.yml` | Every 10 minutes             | Requests `/healthz` so the Render free instance does not go to sleep                            |
 | `ci.yml`     | Push and pull request to `main`  | Lint and format check, tests on Node 22 and 24 with MongoDB, production dependency audit, Docker build and container smoke test |
 | `codeql.yml` | Push, pull request and weekly    | GitHub CodeQL security analysis                                                                    |
 | `deploy.yml` | After CI succeeds on `main`      | Publishes the image to GitHub Container Registry, triggers the Render deploy hook and waits for `/healthz` |
-| Dependabot   | Weekly                           | Pull requests for npm, GitHub Actions and Docker base image updates                                |
+| Dependabot   | Monthly                          | One grouped pull request per ecosystem for minor and patch updates; major versions are skipped     |
 
 To enable continuous deployment:
 
@@ -288,9 +290,22 @@ The image runs as a non-root user and includes a health check. Images built by t
 
 ---
 
+## Performance
+
+The home page downloads about 0.6 MB on a first visit, down from roughly 5 MB in version 2.0.0, and repeat visits are served almost entirely from the browser cache.
+
+- **Images.** Listing photos are requested from Cloudinary and Unsplash as resized, cropped WebP files with a responsive `srcset`, so a card image is about 30 KB instead of 300 KB. Uploads are stored on Cloudinary as WebP. The hero and sign-in images are self-hosted WebP files in several sizes; only the first image on a page loads eagerly, the rest lazily.
+- **Icons and fonts.** A single SVG sprite (about 5 KB compressed) replaces the Font Awesome icon fonts (about 300 KB). The Fraunces and Inter variable fonts are self-hosted, subset to Latin and preloaded, removing the Google Fonts round trips.
+- **JavaScript.** Bootstrap's JavaScript bundle is replaced by about 3 KB of plain JavaScript, and all scripts load with `defer`.
+- **Caching.** Every static URL carries a content hash (`?v=`), so assets are served with a one-year immutable cache header and still refresh instantly after a deploy.
+- **Server.** The listing page runs its database queries in parallel, and the home page statistics are cached in memory for five minutes and cleared when listings or reviews change. Responses are compressed.
+- **Cold starts.** Render's free plan stops idle services, which makes the next visit slow. The `keepalive.yml` workflow requests `/healthz` every ten minutes; remove it on a paid plan. For the lowest latency, run the Render service and the MongoDB Atlas cluster in the same region.
+
+---
+
 ## Security
 
-- **Content Security Policy** without inline scripts. All first-party JavaScript is served from files, and vendor libraries are self-hosted.
+- **Content Security Policy** without inline scripts. All first-party JavaScript is served from files, and vendor libraries, fonts and icons are self-hosted.
 - **CSRF protection** with per-session synchroniser tokens on every state-changing request, including uploads and JSON calls.
 - **Sessions** stored in MongoDB, encrypted at rest, with `HttpOnly`, `SameSite=Lax` and `Secure` (in production) cookies, a seven-day rolling lifetime and regeneration on sign-in.
 - **Authentication hardening**: salted PBKDF2 password hashes, a password policy, generic error messages, progressive delays and temporary lockout after repeated failures, rate limiting on authentication routes, and verified-email-only linking of OAuth accounts.

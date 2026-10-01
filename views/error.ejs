@@ -3,11 +3,11 @@
 <div class="container-xl">
   <section class="error-page" aria-labelledby="errorHeading">
     <div class="error-code" aria-hidden="true"><%= status %></div>
-    <h1 id="errorHeading" class="h2 mt-3"><%= heading %></h1>
-    <p class="text-muted mb-4"><%= message %></p>
+    <h1 id="errorHeading" class="mt-3"><%= heading %></h1>
+    <p class="lede text-muted mb-4"><%= message %></p>
     <div class="d-flex flex-wrap justify-content-center gap-2">
-      <a href="/listings" class="btn btn-brand">Explore stays</a>
-      <button type="button" class="btn btn-quiet" data-history-back>Go back</button>
+      <a href="/listings" class="btn btn-primary">Explore stays</a>
+      <button type="button" class="btn btn-outline" data-history-back>Go back</button>
     </div>
   </section>
 </div>

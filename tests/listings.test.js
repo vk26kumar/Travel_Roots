@@ -41,7 +41,7 @@ describe("listings, reviews and wishlist", () => {
 
     const injection = await h.request(app).get("/listings?search=.*");
     assert.equal(injection.status, 200);
-    assert.match(injection.text, /0<\/strong> stays found/);
+    assert.match(injection.text, /<strong>0<\/strong> stays/);
   });
 
   it("creates a listing through the upload form with validation", async () => {

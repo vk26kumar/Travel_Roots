@@ -13,9 +13,15 @@ const path = require("path");
 
 const env = process.env.NODE_ENV || "development";
 
-// Tests never read .env so they cannot reach real payment, OAuth or storage accounts.
+// Only development reads .env (with Node's built-in loader). Tests never do, so
+// they cannot reach real payment, OAuth or storage accounts. Variables that are
+// already set in the environment always take precedence.
 if (env === "development") {
-  require("dotenv").config({ path: path.join(__dirname, "..", "..", ".env"), quiet: true });
+  try {
+    process.loadEnvFile(path.join(__dirname, "..", "..", ".env"));
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+  }
 }
 
 const isProduction = env === "production";

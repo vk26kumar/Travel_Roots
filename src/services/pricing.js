@@ -68,4 +68,4 @@ function quote(pricePerNight, nights, taxRate = config.pricing.taxRate) {
   };
 }
 
-module.exports = { parseDate, validateStay, quote, DAY_MS };
+module.exports = { parseDate, validateStay, quote };

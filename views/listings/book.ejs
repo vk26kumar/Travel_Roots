@@ -1,20 +1,23 @@
 <% layout("/layouts/boilerplate") %>
 <% if (features.payments) { %>
-<% block("scripts").append('<script src="https://checkout.razorpay.com/v1/checkout.js"></script>') %>
+<% block("scripts").append('<script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>') %>
 <% } %>
-<% block("scripts").append(`<script src="/js/booking.js?v=${assetVersion}"></script>`) %>
-<% const listingId = listing._id.toString(); %>
+<% block("scripts").append(`<script src="${helpers.asset("/js/booking.js")}" defer></script>`) %>
+<%
+  const listingId = listing._id.toString();
+  const imageSrc = listing.image && listing.image.url;
+%>
 
 <div class="container-xl">
-  <header class="pt-4 pb-3">
-    <a href="/listings/<%= listingId %>" class="small text-decoration-none"><i class="fa-solid fa-arrow-left me-1" aria-hidden="true"></i>Back to listing</a>
-    <h1 class="h2 mt-2">Confirm and pay</h1>
+  <header class="page-intro mb-3">
+    <a href="/listings/<%= listingId %>" class="back-link"><%- helpers.icon("arrow-left") %>Back to listing</a>
+    <h1>Confirm and pay</h1>
   </header>
 
   <% if (!features.payments) { %>
-  <div class="alert alert-warning">
-    <i class="fa-solid fa-triangle-exclamation me-2" aria-hidden="true"></i>
-    Online payments are not available right now. You can still contact the host using the details below.
+  <div class="callout mb-4">
+    <%- helpers.icon("alert") %>
+    <div>Online payments are not available right now. You can still contact the host using the details below.</div>
   </div>
   <% } %>
 
@@ -29,8 +32,9 @@
     data-payments="<%= features.payments ? 'true' : 'false' %>"
   >
     <div class="col-lg-7">
-      <section class="surface settings-card">
+      <section class="surface panel">
         <h2>Your trip</h2>
+        <p class="panel-intro">Stays can be up to <%= maxNights %> nights.</p>
         <div class="row g-3">
           <div class="col-sm-6">
             <label for="checkIn" class="form-label">Check-in</label>
@@ -41,39 +45,37 @@
             <input type="date" id="checkOut" name="checkOut" class="form-control" required />
           </div>
         </div>
-        <p class="mt-3 mb-0 text-muted">
-          <span data-nights>0</span> night(s) selected. Stays can be up to <%= maxNights %> nights.
-        </p>
-        <div id="bookingError" class="alert alert-danger mt-3 mb-0" role="alert" hidden></div>
+        <p class="mt-3 mb-0 text-muted"><span data-nights>0</span> night(s) selected.</p>
+        <div id="bookingError" class="callout callout-error mt-3" role="alert" hidden></div>
       </section>
 
       <% if (unavailable.length) { %>
-      <section class="surface settings-card">
+      <section class="surface panel">
         <h2>Already booked</h2>
-        <p class="text-muted">These dates are taken. Choose a stay that does not overlap them.</p>
-        <ul class="mb-0">
+        <p class="panel-intro">These dates are taken. Choose a stay that does not overlap them.</p>
+        <ul class="plain-list">
           <% for (const range of unavailable) { %>
-          <li><%= helpers.formatDate(range.fromDate) %> to <%= helpers.formatDate(range.toDate) %></li>
+          <li><span><%= helpers.formatDate(range.fromDate) %></span><span class="text-muted">to</span><span><%= helpers.formatDate(range.toDate) %></span></li>
           <% } %>
         </ul>
       </section>
       <% } %>
 
-      <section class="surface settings-card">
+      <section class="surface panel">
         <h2>Contact your host</h2>
-        <p class="text-muted">
+        <p class="panel-intro">
           Questions about the space, check-in or cancellations? Reach <%= listing.owner ? (listing.owner.displayName || listing.owner.username) : "the host" %> directly.
         </p>
-        <ul class="fact-list">
-          <li><i class="fa-solid fa-phone" aria-hidden="true"></i><a href="tel:<%= listing.phone.replace(/[^0-9+]/g, '') %>"><%= listing.phone %></a></li>
-          <li><i class="fa-regular fa-envelope" aria-hidden="true"></i><a href="mailto:<%= listing.email %>"><%= listing.email %></a></li>
+        <ul class="facts">
+          <li><%- helpers.icon("phone") %><div><strong>Phone</strong><a href="tel:<%= listing.phone.replace(/[^0-9+]/g, '') %>"><%= listing.phone %></a></div></li>
+          <li><%- helpers.icon("mail") %><div><strong>Email</strong><a href="mailto:<%= listing.email %>"><%= listing.email %></a></div></li>
         </ul>
       </section>
 
-      <section class="surface settings-card">
+      <section class="surface panel">
         <h2>Good to know</h2>
-        <ul class="text-muted mb-0">
-          <li>Your card details are entered in the Razorpay checkout and never reach Travel Roots.</li>
+        <ul class="text-muted mb-0 ps-3">
+          <li>Your card details are entered in the Razorpay window and never reach Travel Roots.</li>
           <li>The amount you pay is calculated and verified by our servers before the booking is confirmed.</li>
           <li>Cancellations and refunds are arranged with your host. See our <a href="/terms#payments">Terms of Service</a>.</li>
         </ul>
@@ -81,15 +83,15 @@
     </div>
 
     <aside class="col-lg-5">
-      <div class="surface checkout-summary">
-        <div class="checkout-listing">
-          <img src="<%= helpers.imageUrl(listing.image && listing.image.url, { width: 240, height: 200 }) %>" alt="" />
+      <div class="surface summary">
+        <div class="summary-listing">
+          <img src="<%= helpers.imageUrl(imageSrc, { width: 208, height: 168 }) %>" alt="" width="104" height="84" />
           <div>
-            <div class="small text-muted"><%= listing.category %></div>
-            <div class="fw-bold"><%= listing.title %></div>
+            <span class="listing-card-kicker"><%= listing.category %></span>
+            <div class="fw-semibold"><%= listing.title %></div>
             <div class="small text-muted"><%= helpers.placeName(listing.location, listing.country) %></div>
             <% if (listing.ratingCount > 0) { %>
-            <span class="rating small"><i class="fa-solid fa-star" aria-hidden="true"></i><%= listing.ratingAverage.toFixed(1) %> (<%= listing.ratingCount %>)</span>
+            <span class="rating small"><%- helpers.icon("star") %><%= listing.ratingAverage.toFixed(1) %> (<%= listing.ratingCount %>)</span>
             <% } %>
           </div>
         </div>
@@ -99,10 +101,8 @@
         <div class="price-row"><span>GST (<%= Math.round(taxRate * 100) %>%)</span><span id="summaryTax">&#8377;0</span></div>
         <div class="price-row total"><span>Total (INR)</span><span id="summaryTotal">&#8377;0</span></div>
 
-        <button id="payButton" type="submit" class="btn btn-brand btn-lg w-100 mt-4" data-label="Confirm and pay" disabled>Confirm and pay</button>
-        <p class="small text-muted text-center mt-3 mb-0">
-          <i class="fa-solid fa-lock me-1" aria-hidden="true"></i>Secure payment powered by Razorpay
-        </p>
+        <button id="payButton" type="submit" class="btn btn-primary btn-lg w-100 mt-4" data-label="Confirm and pay" disabled>Confirm and pay</button>
+        <p class="small text-muted text-center mt-3 mb-0"><%- helpers.icon("lock") %> Secure payment by Razorpay</p>
       </div>
     </aside>
   </form>

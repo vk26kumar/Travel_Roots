@@ -13,7 +13,7 @@ const { MongoMemoryServer } = require("mongodb-memory-server");
 
 async function main() {
   const mongo = await MongoMemoryServer.create();
-  // Set before config loads; dotenv never overrides variables that already exist.
+  // Set before config loads; values from .env never override variables that already exist.
   process.env.ATLASDB_URL = `${mongo.getUri()}travelroots_demo`;
 
   const mongoose = require("mongoose");

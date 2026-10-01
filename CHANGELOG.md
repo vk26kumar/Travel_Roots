@@ -2,6 +2,31 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.1.0] - 2026-10-02
+
+### Changed
+
+- New visual design: an editorial look with Fraunces serif headlines, an earthy palette, hairline rules, a split hero with search, underlined category navigation, redesigned cards, listing pages, profile, checkout, receipts, sign-in pages and footer, in both light and dark themes.
+- Home page weight reduced from roughly 5 MB to about 0.6 MB. Images are served as resized WebP files with responsive `srcset`; uploads are stored as WebP.
+- Replaced Font Awesome with an SVG icon sprite, Google Fonts with self-hosted variable fonts and the Bootstrap JavaScript bundle with a few lines of plain JavaScript.
+- Static assets are cached for a year using content-hashed URLs.
+- The listing page runs its queries in parallel and caches home page statistics.
+- Dependabot now opens one grouped pull request per ecosystem each month and skips major versions. The Docker image uses the Node.js 24 LTS release.
+- Upgraded Joi to 18 and mongodb-memory-server to 11.
+
+### Removed
+
+- Unused dependencies: `ejs` (bundled by `ejs-mate`), `dotenv` (replaced by Node's built-in `process.loadEnvFile`) and `@fortawesome/fontawesome-free`.
+
+### Fixed
+
+- One seeded listing image was blocked by the Content Security Policy because it is served from `plus.unsplash.com`.
+
+### Added
+
+- `npm run demo` runs the application locally on a temporary in-memory database with sample data.
+- A keep-alive workflow prevents slow first visits caused by the Render free plan going to sleep.
+
 ## [2.0.0] - 2026-10-02
 
 A full revamp focused on security, reliability, user experience and production readiness.

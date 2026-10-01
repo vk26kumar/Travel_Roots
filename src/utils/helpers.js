@@ -1,6 +1,7 @@
 "use strict";
 
 const crypto = require("crypto");
+const { asset } = require("./assets");
 
 /** Escapes user input so it can be embedded safely in a regular expression. */
 function escapeRegex(value) {
@@ -47,16 +48,61 @@ function sha256(value) {
   return crypto.createHash("sha256").update(value).digest("hex");
 }
 
+const PLACEHOLDER_IMAGE = "/images/placeholder.svg";
+
 /**
- * Returns a resized, auto-format Cloudinary URL. Non-Cloudinary URLs (for
- * example seeded Unsplash images) are returned unchanged.
+ * Returns a resized, cropped WebP URL for Cloudinary and Unsplash images so
+ * the browser never downloads a full-size original. Other URLs are returned
+ * unchanged.
  */
 function imageUrl(url, { width = 800, height } = {}) {
-  if (typeof url !== "string" || !url) return "/images/placeholder.svg";
-  if (!url.includes("res.cloudinary.com") || !url.includes("/upload/")) return url;
-  const transforms = ["f_auto", "q_auto", "c_fill", `w_${width}`];
-  if (height) transforms.push(`h_${height}`);
-  return url.replace("/upload/", `/upload/${transforms.join(",")}/`);
+  if (typeof url !== "string" || !url) return PLACEHOLDER_IMAGE;
+
+  if (url.includes("res.cloudinary.com") && url.includes("/upload/")) {
+    const transforms = ["f_webp", "q_auto:eco", "c_fill", `w_${width}`];
+    if (height) transforms.push(`h_${height}`);
+    // Drop transformations added to previously generated URLs before applying new ones.
+    const original = url.replace(/\/upload\/(?:[a-z]+_[^/]+\/)+(?=v\d+\/)/, "/upload/");
+    return original.replace("/upload/", `/upload/${transforms.join(",")}/`);
+  }
+
+  if (/^https:\/\/(images|plus)\.unsplash\.com\//.test(url)) {
+    const parsed = new URL(url);
+    const params = new URLSearchParams({ w: String(width), q: "60", fm: "webp", fit: "crop" });
+    if (height) params.set("h", String(height));
+    return `${parsed.origin}${parsed.pathname}?${params}`;
+  }
+
+  return url;
+}
+
+/** Builds a `srcset` for a resizable image at a fixed aspect ratio (width / height). */
+function imageSrcset(url, widths, aspect) {
+  const resizable =
+    typeof url === "string" &&
+    ((url.includes("res.cloudinary.com") && url.includes("/upload/")) ||
+      /^https:\/\/(images|plus)\.unsplash\.com\//.test(url));
+  if (!resizable) return "";
+  return widths
+    .map((width) => `${imageUrl(url, { width, height: Math.round(width / aspect) })} ${width}w`)
+    .join(", ");
+}
+
+/**
+ * Inline reference to an icon in the SVG sprite. Icons are decorative by
+ * default; pass `label` for icons that convey meaning on their own.
+ */
+function icon(name, { className = "", label = "" } = {}) {
+  const a11y = label ? `role="img" aria-label="${escapeHtml(label)}"` : 'aria-hidden="true"';
+  const href = `${asset("/images/icons.svg")}#i-${name}`;
+  return `<svg class="icon ${className}" ${a11y} focusable="false"><use href="${href}"></use></svg>`;
+}
+
+function escapeHtml(value) {
+  return String(value).replace(
+    /[&<>"']/g,
+    (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char],
+  );
 }
 
 const inrFormatter = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 });
@@ -107,6 +153,10 @@ module.exports = {
   safeEqual,
   sha256,
   imageUrl,
+  imageSrcset,
+  icon,
+  escapeHtml,
+  asset,
   formatINR,
   formatDate,
   placeName,

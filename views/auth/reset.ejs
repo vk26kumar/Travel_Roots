@@ -1,19 +1,19 @@
 <% layout("/layouts/boilerplate") %>
 
 <div class="container-xl">
-  <div class="surface narrow-card">
-    <span class="empty-state-icon"><i class="fa-solid fa-lock" aria-hidden="true"></i></span>
-    <h1 class="h3">Choose a new password</h1>
+  <div class="surface narrow">
+    <span class="empty-state-icon"><%- helpers.icon("lock") %></span>
+    <h1>Choose a new password</h1>
     <p class="text-muted">Use at least 8 characters, including a letter and a number.</p>
 
     <form action="/reset-password/<%= token %>" method="POST" class="needs-validation" novalidate>
       <input type="hidden" name="_csrf" value="<%= csrfToken() %>" />
       <div class="mb-3">
         <label for="resetPassword" class="form-label">New password</label>
-        <div class="input-icon">
-          <i class="fa-solid fa-lock" aria-hidden="true"></i>
+        <div class="field-icon">
+          <%- helpers.icon("lock") %>
           <input id="resetPassword" name="password" type="password" class="form-control" autocomplete="new-password" minlength="8" maxlength="128" pattern="(?=.*[A-Za-z])(?=.*[0-9]).{8,}" required />
-          <button type="button" class="password-toggle" data-password-toggle="resetPassword" aria-label="Show password"><i class="fa-regular fa-eye" aria-hidden="true"></i></button>
+          <button type="button" class="password-toggle" data-password-toggle="resetPassword" aria-pressed="false" aria-label="Show password"><%- helpers.icon("eye", { className: "icon-eye" }) %><%- helpers.icon("eye-off", { className: "icon-eye-off" }) %></button>
           <div class="invalid-feedback">Use at least 8 characters with a letter and a number.</div>
         </div>
       </div>
@@ -22,7 +22,7 @@
         <input id="resetConfirm" name="confirmPassword" type="password" class="form-control" autocomplete="new-password" maxlength="128" required />
         <div class="invalid-feedback">Please confirm your new password.</div>
       </div>
-      <button type="submit" class="btn btn-brand w-100" data-loading-text="Saving...">Update password</button>
+      <button type="submit" class="btn btn-primary w-100" data-loading-text="Saving...">Update password</button>
     </form>
   </div>
 </div>

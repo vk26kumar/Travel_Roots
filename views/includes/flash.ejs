@@ -1,17 +1,17 @@
 <% if ((success && success.length) || (error && error.length)) { %>
 <div class="flash-stack" aria-live="polite">
   <% for (const message of success) { %>
-  <div class="alert alert-success alert-dismissible fade show" role="status" data-autodismiss>
-    <i class="fa-solid fa-circle-check mt-1" aria-hidden="true"></i>
+  <div class="notice" role="status" data-notice data-autodismiss>
+    <%- helpers.icon("circle-check") %>
     <div><%= message %></div>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Dismiss"></button>
+    <button type="button" class="notice-close" data-dismiss aria-label="Dismiss"><%- helpers.icon("x") %></button>
   </div>
   <% } %>
   <% for (const message of error) { %>
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <i class="fa-solid fa-circle-exclamation mt-1" aria-hidden="true"></i>
+  <div class="notice notice-error" role="alert" data-notice>
+    <%- helpers.icon("circle-alert") %>
     <div><%= message %></div>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Dismiss"></button>
+    <button type="button" class="notice-close" data-dismiss aria-label="Dismiss"><%- helpers.icon("x") %></button>
   </div>
   <% } %>
 </div>

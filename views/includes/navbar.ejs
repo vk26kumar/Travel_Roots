@@ -1,111 +1,73 @@
 <%
   const isActive = (prefix) => currentPath === prefix || currentPath.startsWith(`${prefix}/`);
+  const themeToggle = `<button class="btn btn-ghost btn-icon" type="button" data-theme-toggle aria-label="Toggle dark mode">${helpers.icon("moon", { className: "theme-icon-moon" })}${helpers.icon("sun", { className: "theme-icon-sun" })}</button>`;
 %>
-<header class="site-header sticky-top">
+<header class="site-header">
   <nav class="navbar navbar-expand-lg" aria-label="Primary">
-    <div class="container-xl">
-      <a class="brand me-lg-4" href="/listings" aria-label="Travel Roots home">
-        <span class="brand-mark" aria-hidden="true"><i class="fa-regular fa-compass"></i></span>
+    <div class="container-xl gap-3">
+      <a class="brand" href="/listings" aria-label="Travel Roots home">
+        <span class="brand-mark" aria-hidden="true"><%- helpers.icon("sprout") %></span>
         <span>Travel Roots</span>
       </a>
 
-      <div class="d-flex align-items-center gap-2 d-lg-none">
-        <button class="btn btn-quiet btn-icon" type="button" data-theme-toggle aria-label="Toggle dark mode">
-          <i class="fa-solid fa-moon" aria-hidden="true"></i>
-        </button>
+      <div class="d-flex align-items-center gap-1 d-lg-none">
+        <%- themeToggle %>
         <button
-          class="navbar-toggler border-0 shadow-none"
+          class="btn btn-ghost btn-icon nav-toggler"
           type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#primaryNav"
+          data-collapse="#primaryNav"
           aria-controls="primaryNav"
           aria-expanded="false"
-          aria-label="Toggle navigation"
+          aria-label="Open menu"
         >
-          <span class="navbar-toggler-icon"></span>
+          <%- helpers.icon("menu") %>
         </button>
       </div>
 
-      <div class="collapse navbar-collapse" id="primaryNav">
-        <ul class="navbar-nav me-lg-3">
-          <li class="nav-item">
-            <a class="nav-link <%= currentPath === '/listings' ? 'active' : '' %>" href="/listings" <%- currentPath === '/listings' ? 'aria-current="page"' : '' %>>Explore</a>
-          </li>
+      <div class="collapse navbar-collapse gap-3" id="primaryNav">
+        <ul class="nav-links">
+          <li><a class="nav-link-item <%= currentPath === '/listings' ? 'active' : '' %>" href="/listings" <%- currentPath === '/listings' ? 'aria-current="page"' : '' %>>Explore</a></li>
+          <li><a class="nav-link-item <%= isActive('/listings/new') ? 'active' : '' %>" href="/listings/new">Host your place</a></li>
         </ul>
 
-        <form class="nav-search mx-lg-auto" role="search" action="/listings" method="GET">
+        <form class="header-search ms-lg-auto" role="search" action="/listings" method="GET">
           <label for="navSearch" class="visually-hidden">Search destinations</label>
-          <input
-            id="navSearch"
-            type="search"
-            name="search"
-            placeholder="Search a city, country or stay"
-            value="<%= searchQuery %>"
-            autocomplete="off"
-            maxlength="100"
-          />
-          <button type="submit" aria-label="Search">
-            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-          </button>
+          <%- helpers.icon("search") %>
+          <input id="navSearch" type="search" name="search" placeholder="Search a city, country or stay" value="<%= searchQuery %>" autocomplete="off" maxlength="100" />
         </form>
 
-        <ul class="navbar-nav align-items-lg-center gap-lg-1 ms-lg-3">
-          <li class="nav-item">
-            <a class="nav-link <%= isActive('/listings/new') ? 'active' : '' %>" href="/listings/new">
-              <i class="fa-solid fa-house-chimney me-1" aria-hidden="true"></i> List your place
-            </a>
-          </li>
-          <li class="nav-item d-none d-lg-block">
-            <button class="btn btn-quiet btn-icon border-0" type="button" data-theme-toggle aria-label="Toggle dark mode">
-              <i class="fa-solid fa-moon" aria-hidden="true"></i>
-            </button>
-          </li>
-
+        <div class="d-flex align-items-center gap-2">
+          <span class="d-none d-lg-inline-flex"><%- themeToggle %></span>
           <% if (currUser) { %>
-          <li class="nav-item dropdown mt-2 mt-lg-0">
-            <button
-              class="user-menu-toggle"
-              type="button"
-              data-bs-toggle="dropdown"
-              data-bs-display="static"
-              aria-expanded="false"
-              aria-label="Account menu"
-            >
-              <i class="fa-solid fa-bars" aria-hidden="true"></i>
+          <div class="menu">
+            <button class="menu-toggle" type="button" data-menu="accountMenu" aria-expanded="false" aria-controls="accountMenu" aria-label="Account menu">
               <%- include("avatar", { user: currUser, size: "sm", decorative: true }) %>
+              <span class="small fw-semibold d-lg-none"><%= currUser.displayName || currUser.username %></span>
+              <%- helpers.icon("chevron-down") %>
             </button>
-            <ul class="dropdown-menu dropdown-menu-lg-end">
-              <li class="dropdown-header-user">
-                <div class="fw-bold text-truncate"><%= currUser.displayName || currUser.username %></div>
+            <div class="menu-panel" id="accountMenu" hidden>
+              <div class="menu-header">
+                <div class="fw-semibold text-truncate"><%= currUser.displayName || currUser.username %></div>
                 <div class="small text-muted text-truncate"><%= currUser.email %></div>
-              </li>
-              <li><hr class="dropdown-divider" /></li>
-              <li><a class="dropdown-item" href="/profile"><i class="fa-regular fa-user" aria-hidden="true"></i>Profile</a></li>
-              <li><a class="dropdown-item" href="/profile?tab=trips"><i class="fa-solid fa-suitcase-rolling" aria-hidden="true"></i>Trips</a></li>
-              <li><a class="dropdown-item" href="/profile?tab=saved"><i class="fa-regular fa-heart" aria-hidden="true"></i>Saved stays</a></li>
-              <li><a class="dropdown-item" href="/profile?tab=listings"><i class="fa-solid fa-house" aria-hidden="true"></i>Your listings</a></li>
-              <li><a class="dropdown-item" href="/profile?tab=hosting"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i>Reservations</a></li>
-              <li><a class="dropdown-item" href="/profile/settings"><i class="fa-solid fa-gear" aria-hidden="true"></i>Account settings</a></li>
-              <li><hr class="dropdown-divider" /></li>
-              <li>
-                <form action="/logout" method="POST">
-                  <input type="hidden" name="_csrf" value="<%= csrfToken() %>" />
-                  <button class="dropdown-item" type="submit">
-                    <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>Sign out
-                  </button>
-                </form>
-              </li>
-            </ul>
-          </li>
+              </div>
+              <a class="menu-item" href="/profile"><%- helpers.icon("user") %>Profile</a>
+              <a class="menu-item" href="/profile?tab=trips"><%- helpers.icon("luggage") %>Trips</a>
+              <a class="menu-item" href="/profile?tab=saved"><%- helpers.icon("heart") %>Saved stays</a>
+              <a class="menu-item" href="/profile?tab=listings"><%- helpers.icon("house") %>Your listings</a>
+              <a class="menu-item" href="/profile?tab=hosting"><%- helpers.icon("calendar-check") %>Reservations</a>
+              <a class="menu-item" href="/profile/settings"><%- helpers.icon("settings") %>Account settings</a>
+              <div class="menu-divider"></div>
+              <form action="/logout" method="POST">
+                <input type="hidden" name="_csrf" value="<%= csrfToken() %>" />
+                <button class="menu-item" type="submit"><%- helpers.icon("log-out") %>Sign out</button>
+              </form>
+            </div>
+          </div>
           <% } else { %>
-          <li class="nav-item">
-            <a class="nav-link <%= currentPath === '/login' ? 'active' : '' %>" href="/login">Sign in</a>
-          </li>
-          <li class="nav-item mt-2 mt-lg-0">
-            <a class="btn btn-brand" href="/signup">Sign up</a>
-          </li>
+          <a class="btn btn-ghost" href="/login">Sign in</a>
+          <a class="btn btn-primary" href="/signup">Create account</a>
           <% } %>
-        </ul>
+        </div>
       </div>
     </div>
   </nav>

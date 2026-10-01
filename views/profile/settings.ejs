@@ -2,28 +2,28 @@
 <% const user = currUser; %>
 
 <div class="container-xl">
-  <header class="pt-4 pb-3">
-    <a href="/profile" class="small text-decoration-none"><i class="fa-solid fa-arrow-left me-1" aria-hidden="true"></i>Back to profile</a>
-    <h1 class="h2 mt-2">Account settings</h1>
+  <header class="page-intro mb-4">
+    <a href="/profile" class="back-link"><%- helpers.icon("arrow-left") %>Back to profile</a>
+    <h1>Account settings</h1>
   </header>
 
   <div class="row g-4">
     <nav class="col-lg-3" aria-label="Settings sections">
-      <div class="surface p-2 settings-nav">
-        <a href="#profile"><i class="fa-regular fa-id-card" aria-hidden="true"></i>Profile</a>
-        <a href="#security"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>Sign-in and security</a>
-        <a href="#privacy"><i class="fa-solid fa-cookie-bite" aria-hidden="true"></i>Privacy</a>
-        <a href="#danger"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>Delete account</a>
+      <div class="settings-nav">
+        <a href="#profile"><%- helpers.icon("id-card") %>Profile</a>
+        <a href="#security"><%- helpers.icon("shield") %>Sign-in and security</a>
+        <a href="#privacy"><%- helpers.icon("cookie") %>Privacy</a>
+        <a href="#danger"><%- helpers.icon("alert") %>Delete account</a>
       </div>
     </nav>
 
     <div class="col-lg-9">
-      <section id="profile" class="surface settings-card" aria-labelledby="profileTitle">
+      <section id="profile" class="surface panel" aria-labelledby="profileTitle">
         <div class="d-flex align-items-center gap-3 mb-4">
           <%- include("../includes/avatar", { user, size: "md" }) %>
           <div>
             <h2 id="profileTitle" class="mb-0">Profile</h2>
-            <p class="text-muted mb-0 small">This information appears on your listings and reviews.</p>
+            <p class="text-muted mb-0 small">Shown on your listings and reviews.</p>
           </div>
         </div>
         <form method="POST" action="/profile?_method=PUT" class="needs-validation" novalidate>
@@ -58,13 +58,13 @@
               <div class="form-hint">Up to 500 characters.</div>
             </div>
           </div>
-          <button type="submit" class="btn btn-brand mt-4">Save profile</button>
+          <button type="submit" class="btn btn-primary mt-4">Save profile</button>
         </form>
       </section>
 
-      <section id="security" class="surface settings-card" aria-labelledby="securityTitle">
+      <section id="security" class="surface panel" aria-labelledby="securityTitle">
         <h2 id="securityTitle"><%= hasPassword ? "Change password" : "Set a password" %></h2>
-        <p class="text-muted">
+        <p class="panel-intro">
           <%= hasPassword ? "Use a password you do not use anywhere else." : "You signed up with a social account. Add a password to also sign in with your username." %>
         </p>
         <form method="POST" action="/profile/password?_method=PUT" class="needs-validation" novalidate>
@@ -88,38 +88,29 @@
               <div class="invalid-feedback">Please confirm your new password.</div>
             </div>
           </div>
-          <button type="submit" class="btn btn-brand mt-4"><%= hasPassword ? "Update password" : "Set password" %></button>
+          <button type="submit" class="btn btn-primary mt-4"><%= hasPassword ? "Update password" : "Set password" %></button>
         </form>
 
-        <hr class="my-4" />
-        <h3 class="h6">Connected accounts</h3>
-        <ul class="list-unstyled mb-0">
-          <li class="d-flex justify-content-between py-2">
-            <span><i class="fa-brands fa-google me-2" aria-hidden="true"></i>Google</span>
-            <span class="text-muted"><%= user.googleId ? "Connected" : "Not connected" %></span>
-          </li>
-          <li class="d-flex justify-content-between py-2">
-            <span><i class="fa-brands fa-github me-2" aria-hidden="true"></i>GitHub</span>
-            <span class="text-muted"><%= user.githubId ? "Connected" : "Not connected" %></span>
-          </li>
+        <h3 class="h6 mt-5 mb-2">Connected accounts</h3>
+        <ul class="plain-list">
+          <li><span><%- helpers.icon("google") %> Google</span><span class="text-muted"><%= user.googleId ? "Connected" : "Not connected" %></span></li>
+          <li><span><%- helpers.icon("github") %> GitHub</span><span class="text-muted"><%= user.githubId ? "Connected" : "Not connected" %></span></li>
         </ul>
       </section>
 
-      <section id="privacy" class="surface settings-card" aria-labelledby="privacyTitle">
+      <section id="privacy" class="surface panel" aria-labelledby="privacyTitle">
         <h2 id="privacyTitle">Privacy</h2>
-        <p class="text-muted">
-          Control optional preference storage on this device and read how we handle your information.
-        </p>
+        <p class="panel-intro">Control optional preference storage on this device and read how we handle your information.</p>
         <div class="d-flex flex-wrap gap-2">
-          <button type="button" class="btn btn-quiet" data-cookie-settings>Cookie settings</button>
-          <a href="/privacy" class="btn btn-quiet">Privacy Policy</a>
-          <a href="/cookies" class="btn btn-quiet">Cookie Policy</a>
+          <button type="button" class="btn btn-outline" data-cookie-settings>Cookie settings</button>
+          <a href="/privacy" class="btn btn-ghost">Privacy Policy</a>
+          <a href="/cookies" class="btn btn-ghost">Cookie Policy</a>
         </div>
       </section>
 
-      <section id="danger" class="surface settings-card danger-zone" aria-labelledby="dangerTitle">
-        <h2 id="dangerTitle" class="text-danger">Delete account</h2>
-        <p class="text-muted">
+      <section id="danger" class="surface panel danger-zone" aria-labelledby="dangerTitle">
+        <h2 id="dangerTitle">Delete account</h2>
+        <p class="panel-intro">
           This permanently removes your profile, listings, reviews and saved stays. Records of completed payments are
           kept for accounting and legal purposes but are no longer linked to a profile. This cannot be undone.
         </p>

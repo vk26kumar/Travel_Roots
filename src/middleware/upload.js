@@ -38,4 +38,4 @@ function parseMultipart(req, res, next) {
   });
 }
 
-module.exports = { parseMultipart, MAX_FILE_SIZE };
+module.exports = { parseMultipart };

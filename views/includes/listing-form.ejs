@@ -5,18 +5,18 @@
   const action = isEdit ? `/listings/${values._id}?_method=PUT` : "/listings";
 %>
 <% if (!features.uploads) { %>
-<div class="alert alert-warning">
-  <i class="fa-solid fa-triangle-exclamation me-2" aria-hidden="true"></i>
-  Image uploads are not configured on this server, so new photos cannot be saved right now.
+<div class="callout mb-4">
+  <%- helpers.icon("alert") %>
+  <div>Image uploads are not configured on this server, so new photos cannot be saved right now.</div>
 </div>
 <% } %>
 
 <form method="POST" action="<%= action %>" class="needs-validation" enctype="multipart/form-data" novalidate>
   <input type="hidden" name="_csrf" value="<%= csrfToken() %>" />
 
-  <section class="surface settings-card">
+  <section class="surface panel">
     <h2>The basics</h2>
-    <p class="text-muted">A clear title and an honest description help guests choose your place.</p>
+    <p class="panel-intro">A clear title and an honest description help guests choose your place.</p>
 
     <div class="mb-3">
       <label for="title" class="form-label">Title</label>
@@ -43,7 +43,7 @@
       </div>
       <div class="col-md-6">
         <label for="price" class="form-label">Price per night (INR)</label>
-        <div class="input-group">
+        <div class="input-group has-validation">
           <span class="input-group-text">&#8377;</span>
           <input id="price" name="listing[price]" type="number" class="form-control" value="<%= values.price || '' %>" min="1" max="1000000" step="1" inputmode="numeric" required />
           <div class="invalid-feedback">Enter a whole number between 1 and 10,00,000.</div>
@@ -53,9 +53,9 @@
     </div>
   </section>
 
-  <section class="surface settings-card">
+  <section class="surface panel">
     <h2>Location</h2>
-    <p class="text-muted">Guests see the area on a map. The exact address is not shown publicly.</p>
+    <p class="panel-intro">Guests see the area on a map. The exact address is not shown publicly.</p>
     <div class="row g-3">
       <div class="col-md-6">
         <label for="location" class="form-label">City or area</label>
@@ -70,22 +70,23 @@
     </div>
   </section>
 
-  <section class="surface settings-card">
+  <section class="surface panel">
     <h2>Photo</h2>
+    <p class="panel-intro">Landscape photos work best. Photos are stored and served as optimised WebP images.</p>
     <% if (isEdit && values.image && values.image.url) { %>
-    <p class="text-muted mb-2">Current photo</p>
+    <p class="small text-muted mb-2">Current photo</p>
     <img class="image-preview mb-3" src="<%= helpers.imageUrl(values.image.url, { width: 720, height: 540 }) %>" alt="Current photo of <%= values.title %>" />
     <% } %>
     <label for="image" class="form-label"><%= isEdit ? "Replace photo (optional)" : "Upload a photo" %></label>
     <input id="image" name="listing[image]" type="file" class="form-control" accept="image/jpeg,image/png,image/webp" data-preview="imagePreview" <%= isEdit ? "" : "required" %> />
     <div class="invalid-feedback">Please choose a JPG, PNG or WebP image up to 5 MB.</div>
-    <div class="form-hint">JPG, PNG or WebP, up to 5 MB. Landscape photos look best.</div>
+    <div class="form-hint">JPG, PNG or WebP, up to 5 MB.</div>
     <img id="imagePreview" class="image-preview mt-3" alt="Preview of the selected photo" hidden />
   </section>
 
-  <section class="surface settings-card">
+  <section class="surface panel">
     <h2>Contact details</h2>
-    <p class="text-muted">Shown to signed-in guests on the booking page.</p>
+    <p class="panel-intro">Shown to signed-in guests on the booking page.</p>
     <div class="row g-3">
       <div class="col-md-6">
         <label for="phone" class="form-label">Phone number</label>
@@ -101,7 +102,7 @@
   </section>
 
   <% if (!isEdit) { %>
-  <div class="form-check mb-4">
+  <div class="form-check my-4">
     <input class="form-check-input" type="checkbox" value="accepted" id="terms" name="terms" required />
     <label class="form-check-label" for="terms">
       I confirm I am allowed to host this place and agree to the <a href="/terms#hosts" target="_blank">host terms</a>.
@@ -110,8 +111,8 @@
   </div>
   <% } %>
 
-  <div class="d-flex flex-wrap gap-2">
-    <button type="submit" class="btn btn-brand btn-lg" data-loading-text="<%= isEdit ? 'Saving...' : 'Publishing...' %>"><%= isEdit ? "Save changes" : "Publish listing" %></button>
-    <a href="<%= isEdit ? `/listings/${values._id}` : '/listings' %>" class="btn btn-quiet btn-lg">Cancel</a>
+  <div class="d-flex flex-wrap gap-2 mt-4">
+    <button type="submit" class="btn btn-primary btn-lg" data-loading-text="<%= isEdit ? 'Saving...' : 'Publishing...' %>"><%= isEdit ? "Save changes" : "Publish listing" %></button>
+    <a href="<%= isEdit ? `/listings/${values._id}` : '/listings' %>" class="btn btn-outline btn-lg">Cancel</a>
   </div>
 </form>

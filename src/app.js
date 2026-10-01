@@ -61,14 +61,28 @@ function createApp({ sessionStore } = {}) {
     );
   }
 
-  const staticOptions = { maxAge: config.isProduction ? "7d" : 0 };
-  app.use(express.static(path.join(ROOT, "public"), staticOptions));
+  // Versioned URLs (?v=<content hash>) are immutable; anything else is revalidated daily.
+  const staticOptions = {
+    setHeaders(res) {
+      if (!config.isProduction) return res.setHeader("Cache-Control", "no-cache");
+      const versioned = res.req && res.req.query && res.req.query.v;
+      return res.setHeader(
+        "Cache-Control",
+        versioned ? "public, max-age=31536000, immutable" : "public, max-age=86400",
+      );
+    },
+  };
   const vendor = (pkgPath) => path.join(ROOT, "node_modules", pkgPath);
-  app.use("/vendor/bootstrap", express.static(vendor("bootstrap/dist"), staticOptions));
+  app.use(express.static(path.join(ROOT, "public"), staticOptions));
+  app.use("/vendor/bootstrap", express.static(vendor("bootstrap/dist/css"), staticOptions));
   app.use("/vendor/leaflet", express.static(vendor("leaflet/dist"), staticOptions));
   app.use(
-    "/vendor/fontawesome",
-    express.static(vendor("@fortawesome/fontawesome-free"), staticOptions),
+    "/vendor/fonts",
+    express.static(vendor("@fontsource-variable/inter/files"), staticOptions),
+  );
+  app.use(
+    "/vendor/fonts",
+    express.static(vendor("@fontsource-variable/fraunces/files"), staticOptions),
   );
 
   // Health probes and payment webhooks bypass sessions, CSRF and rate limiting.

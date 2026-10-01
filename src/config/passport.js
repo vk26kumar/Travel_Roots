@@ -137,4 +137,4 @@ function configurePassport() {
   return passport;
 }
 
-module.exports = { configurePassport, findOrCreateOAuthUser, uniqueUsername };
+module.exports = { configurePassport };

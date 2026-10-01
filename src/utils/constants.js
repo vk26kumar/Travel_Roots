@@ -1,15 +1,15 @@
 "use strict";
 
-/** Listing categories and the Font Awesome icon shown for each. */
+/** Listing categories and the sprite icon shown for each. */
 const CATEGORIES = [
-  { name: "Trending", icon: "fa-solid fa-fire" },
-  { name: "Rooms", icon: "fa-solid fa-bed" },
-  { name: "Iconic Cities", icon: "fa-solid fa-mountain-city" },
-  { name: "Mountain", icon: "fa-solid fa-mountain" },
-  { name: "Castles", icon: "fa-brands fa-fort-awesome" },
-  { name: "Pools", icon: "fa-solid fa-person-swimming" },
-  { name: "Camping", icon: "fa-solid fa-campground" },
-  { name: "Farms", icon: "fa-solid fa-cow" },
+  { name: "Trending", icon: "flame" },
+  { name: "Rooms", icon: "bed" },
+  { name: "Iconic Cities", icon: "building" },
+  { name: "Mountain", icon: "mountain" },
+  { name: "Castles", icon: "castle" },
+  { name: "Pools", icon: "waves" },
+  { name: "Camping", icon: "tent" },
+  { name: "Farms", icon: "tractor" },
 ];
 
 const CATEGORY_NAMES = CATEGORIES.map((category) => category.name);

@@ -1,32 +1,33 @@
 <% layout("/layouts/boilerplate") %>
-<% const isSignup = mode === "signup"; %>
+<%
+  const isSignup = mode === "signup";
+  const authSrcset = ["640", "960"].map((w) => `${helpers.asset(`/images/auth-${w}.webp`)} ${w}w`).join(", ");
+  const passwordToggle = (id) => `<button type="button" class="password-toggle" data-password-toggle="${id}" aria-pressed="false" aria-label="Show password">${helpers.icon("eye", { className: "icon-eye" })}${helpers.icon("eye-off", { className: "icon-eye-off" })}</button>`;
+%>
 
 <div class="container-xl">
-  <div class="surface auth-shell">
-    <div class="auth-visual" aria-hidden="true">
-      <h2 class="h3">Your next stay starts here.</h2>
-      <p class="mb-0">Save places you love, book in a few clicks and keep every receipt in one place.</p>
+  <div class="surface auth">
+    <div class="auth-media" aria-hidden="true">
+      <img src="<%= helpers.asset('/images/auth-640.webp') %>" srcset="<%= authSrcset %>" sizes="540px" alt="" width="640" height="800" />
+      <blockquote>Save places you love, book in a few clicks and keep every receipt in one place.</blockquote>
     </div>
 
-    <div class="auth-panel">
-      <h1 class="h3 mb-1"><%= isSignup ? "Create your account" : "Welcome back" %></h1>
-      <p class="text-muted mb-4"><%= isSignup ? "Join Travel Roots to book stays and host your own place." : "Sign in to manage your trips and listings." %></p>
+    <div class="auth-form">
+      <span class="eyebrow"><%= isSignup ? "Join Travel Roots" : "Welcome back" %></span>
+      <h1><%= isSignup ? "Create your account" : "Sign in to continue" %></h1>
+      <p class="text-muted mb-0"><%= isSignup ? "Book stays, save favourites and host your own place." : "Manage your trips, saved stays and listings." %></p>
 
-      <nav class="auth-tabs" aria-label="Account">
+      <nav class="auth-switch" aria-label="Account">
         <a href="/login" class="<%= isSignup ? '' : 'active' %>" <%- isSignup ? '' : 'aria-current="page"' %>>Sign in</a>
         <a href="/signup" class="<%= isSignup ? 'active' : '' %>" <%- isSignup ? 'aria-current="page"' : '' %>>Create account</a>
       </nav>
 
       <% if (features.google || features.github) { %>
-      <div class="oauth-buttons">
-        <% if (features.google) { %>
-        <a class="btn btn-quiet" href="/auth/google"><i class="fa-brands fa-google me-2" aria-hidden="true"></i>Google</a>
-        <% } %>
-        <% if (features.github) { %>
-        <a class="btn btn-quiet" href="/auth/github"><i class="fa-brands fa-github me-2" aria-hidden="true"></i>GitHub</a>
-        <% } %>
+      <div class="oauth">
+        <% if (features.google) { %><a class="btn btn-outline" href="/auth/google"><%- helpers.icon("google") %>Continue with Google</a><% } %>
+        <% if (features.github) { %><a class="btn btn-outline" href="/auth/github"><%- helpers.icon("github") %>Continue with GitHub</a><% } %>
       </div>
-      <div class="divider-text">or continue with <%= isSignup ? "email" : "your username" %></div>
+      <div class="divider-text">or with <%= isSignup ? "your email" : "your username" %></div>
       <% } %>
 
       <% if (isSignup) { %>
@@ -34,26 +35,26 @@
         <input type="hidden" name="_csrf" value="<%= csrfToken() %>" />
         <div class="mb-3">
           <label for="signupUsername" class="form-label">Username</label>
-          <div class="input-icon">
-            <i class="fa-regular fa-user" aria-hidden="true"></i>
+          <div class="field-icon">
+            <%- helpers.icon("user") %>
             <input id="signupUsername" name="username" type="text" class="form-control" autocomplete="username" minlength="3" maxlength="30" pattern="[A-Za-z0-9_.\-]+" required />
             <div class="invalid-feedback">3 to 30 characters: letters, numbers, dots, dashes or underscores.</div>
           </div>
         </div>
         <div class="mb-3">
           <label for="signupEmail" class="form-label">Email</label>
-          <div class="input-icon">
-            <i class="fa-regular fa-envelope" aria-hidden="true"></i>
+          <div class="field-icon">
+            <%- helpers.icon("mail") %>
             <input id="signupEmail" name="email" type="email" class="form-control" autocomplete="email" maxlength="254" required />
             <div class="invalid-feedback">Please enter a valid email address.</div>
           </div>
         </div>
         <div class="mb-3">
           <label for="signupPassword" class="form-label">Password</label>
-          <div class="input-icon">
-            <i class="fa-solid fa-lock" aria-hidden="true"></i>
+          <div class="field-icon">
+            <%- helpers.icon("lock") %>
             <input id="signupPassword" name="password" type="password" class="form-control" autocomplete="new-password" minlength="8" maxlength="128" pattern="(?=.*[A-Za-z])(?=.*[0-9]).{8,}" aria-describedby="passwordHint" required />
-            <button type="button" class="password-toggle" data-password-toggle="signupPassword" aria-label="Show password"><i class="fa-regular fa-eye" aria-hidden="true"></i></button>
+            <%- passwordToggle("signupPassword") %>
             <div class="invalid-feedback">Use at least 8 characters with a letter and a number.</div>
           </div>
           <div id="passwordHint" class="form-hint">At least 8 characters, including a letter and a number.</div>
@@ -62,32 +63,32 @@
           By creating an account you agree to our <a href="/terms">Terms of Service</a> and acknowledge our
           <a href="/privacy">Privacy Policy</a>.
         </p>
-        <button type="submit" class="btn btn-brand btn-lg w-100" data-loading-text="Creating account...">Create account</button>
+        <button type="submit" class="btn btn-primary btn-lg w-100" data-loading-text="Creating account...">Create account</button>
       </form>
       <% } else { %>
       <form action="/login" method="POST" class="needs-validation" novalidate>
         <input type="hidden" name="_csrf" value="<%= csrfToken() %>" />
         <div class="mb-3">
           <label for="loginUsername" class="form-label">Username</label>
-          <div class="input-icon">
-            <i class="fa-regular fa-user" aria-hidden="true"></i>
+          <div class="field-icon">
+            <%- helpers.icon("user") %>
             <input id="loginUsername" name="username" type="text" class="form-control" autocomplete="username" maxlength="254" required />
             <div class="invalid-feedback">Please enter your username.</div>
           </div>
         </div>
         <div class="mb-2">
           <label for="loginPassword" class="form-label">Password</label>
-          <div class="input-icon">
-            <i class="fa-solid fa-lock" aria-hidden="true"></i>
+          <div class="field-icon">
+            <%- helpers.icon("lock") %>
             <input id="loginPassword" name="password" type="password" class="form-control" autocomplete="current-password" maxlength="128" required />
-            <button type="button" class="password-toggle" data-password-toggle="loginPassword" aria-label="Show password"><i class="fa-regular fa-eye" aria-hidden="true"></i></button>
+            <%- passwordToggle("loginPassword") %>
             <div class="invalid-feedback">Please enter your password.</div>
           </div>
         </div>
         <div class="text-end mb-4">
           <a href="/forgot-password" class="small">Forgot your password?</a>
         </div>
-        <button type="submit" class="btn btn-brand btn-lg w-100" data-loading-text="Signing in...">Sign in</button>
+        <button type="submit" class="btn btn-primary btn-lg w-100" data-loading-text="Signing in...">Sign in</button>
       </form>
       <% } %>
     </div>

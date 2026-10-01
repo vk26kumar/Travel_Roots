@@ -70,16 +70,31 @@ describe("helpers", () => {
     assert.equal(helpers.clampInt("abc", { min: 1, max: 5, fallback: 1 }), 1);
   });
 
-  it("adds Cloudinary transformations only to Cloudinary URLs", () => {
+  it("requests resized WebP images from Cloudinary and Unsplash", () => {
     assert.equal(
       helpers.imageUrl("https://res.cloudinary.com/demo/image/upload/v1/a.jpg", { width: 400 }),
-      "https://res.cloudinary.com/demo/image/upload/f_auto,q_auto,c_fill,w_400/v1/a.jpg",
+      "https://res.cloudinary.com/demo/image/upload/f_webp,q_auto:eco,c_fill,w_400/v1/a.jpg",
     );
     assert.equal(
-      helpers.imageUrl("https://images.unsplash.com/x"),
-      "https://images.unsplash.com/x",
+      helpers.imageUrl("https://images.unsplash.com/photo-1?ixlib=rb&w=2000&q=90", {
+        width: 400,
+        height: 300,
+      }),
+      "https://images.unsplash.com/photo-1?w=400&q=60&fm=webp&fit=crop&h=300",
     );
+    assert.equal(helpers.imageUrl("https://example.com/x.jpg"), "https://example.com/x.jpg");
     assert.equal(helpers.imageUrl(""), "/images/placeholder.svg");
+    assert.match(
+      helpers.imageSrcset("https://images.unsplash.com/photo-1", [400, 800], 4 / 3),
+      /w=400.*400w, .*w=800.*800w$/,
+    );
+    assert.equal(helpers.imageSrcset("", [400], 1), "");
+  });
+
+  it("renders sprite icons with an accessible default", () => {
+    assert.match(helpers.icon("search"), /aria-hidden="true"/);
+    assert.match(helpers.icon("search"), /icons\.svg\?v=[a-f0-9]+#i-search/);
+    assert.match(helpers.icon("star", { label: "Rated <5>" }), /aria-label="Rated &lt;5&gt;"/);
   });
 
   it("formats currency and initials", () => {

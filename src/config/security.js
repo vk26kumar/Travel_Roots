@@ -8,7 +8,7 @@ const config = require("./index");
  *
  * All first-party JavaScript is served from external files, so scripts are
  * restricted to `'self'` plus Razorpay Checkout; no inline script is allowed.
- * Vendor libraries (Bootstrap, Leaflet, Font Awesome) are self-hosted.
+ * Vendor libraries, fonts and icons are self-hosted.
  */
 const directives = {
   defaultSrc: ["'self'"],
@@ -18,14 +18,15 @@ const directives = {
   formAction: ["'self'"],
   scriptSrc: ["'self'", "https://checkout.razorpay.com", "https://*.razorpay.com"],
   scriptSrcAttr: ["'none'"],
-  styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-  fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"],
+  styleSrc: ["'self'", "'unsafe-inline'"],
+  fontSrc: ["'self'"],
   imgSrc: [
     "'self'",
     "data:",
     "blob:",
     "https://res.cloudinary.com",
     "https://images.unsplash.com",
+    "https://plus.unsplash.com",
     "https://lh3.googleusercontent.com",
     "https://avatars.githubusercontent.com",
     "https://tile.openstreetmap.org",

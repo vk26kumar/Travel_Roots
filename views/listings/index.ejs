@@ -9,215 +9,210 @@
     const query = params.toString();
     return query ? `/listings?${query}` : "/listings";
   };
+  const heroSrcset = ["640", "960", "1280"].map((w) => `${helpers.asset(`/images/hero-${w}.webp`)} ${w}w`).join(", ");
 %>
 
 <div class="container-xl">
   <% if (isLanding) { %>
   <section class="hero" aria-labelledby="heroTitle">
-    <div class="hero-content">
-      <span class="eyebrow text-white-50">Stays, experiences and memories</span>
-      <h1 id="heroTitle">Find a stay that feels like home.</h1>
-      <p class="lead">
-        Explore handpicked cabins, villas, farm stays and city apartments from hosts around the world, then book
-        securely in minutes.
+    <div>
+      <span class="eyebrow">Stays rooted in place</span>
+      <h1 id="heroTitle">Stay somewhere <em>with a story.</em></h1>
+      <p class="lede">
+        Cabins above the tree line, farmhouses at the end of a dirt road, apartments in the old quarter. Book
+        directly with hosts who know their place, and pay securely online.
       </p>
-      <form class="hero-search" action="/listings" method="GET" role="search">
-        <div>
-          <label for="heroSearch" class="visually-hidden">Where are you going?</label>
-          <input id="heroSearch" class="form-control form-control-lg" type="search" name="search" placeholder="Where are you going?" maxlength="100" />
+
+      <form class="search-panel" action="/listings" method="GET" role="search" aria-label="Find a stay">
+        <div class="search-field">
+          <label for="heroSearch">Where</label>
+          <input id="heroSearch" type="search" name="search" placeholder="City, country or stay" maxlength="100" />
         </div>
-        <div>
-          <label for="heroCategory" class="visually-hidden">Type of stay</label>
-          <select id="heroCategory" class="form-select form-select-lg" name="category">
-            <option value="">Any type of stay</option>
+        <div class="search-field">
+          <label for="heroCategory">Type of stay</label>
+          <select id="heroCategory" name="category">
+            <option value="">Anything</option>
             <% for (const item of categories) { %>
             <option value="<%= item.name %>"><%= item.name %></option>
             <% } %>
           </select>
         </div>
-        <button class="btn btn-brand btn-lg" type="submit">
-          <i class="fa-solid fa-magnifying-glass me-2" aria-hidden="true"></i>Search
-        </button>
+        <button class="btn btn-primary btn-lg" type="submit"><%- helpers.icon("search") %>Search</button>
       </form>
+
+      <% if (stats && stats.stays) { %>
+      <div class="hero-facts" aria-label="Travel Roots in numbers">
+        <span><strong><%= stats.stays.toLocaleString("en-IN") %></strong>stays</span>
+        <span><strong><%= stats.countries.toLocaleString("en-IN") %></strong><%= stats.countries === 1 ? "country" : "countries" %></span>
+        <span><strong><%= stats.hosts.toLocaleString("en-IN") %></strong><%= stats.hosts === 1 ? "host" : "hosts" %></span>
+      </div>
+      <% } %>
+    </div>
+
+    <div class="hero-media">
+      <img
+        src="<%= helpers.asset('/images/hero-960.webp') %>"
+        srcset="<%= heroSrcset %>"
+        sizes="(min-width: 992px) 46vw, 100vw"
+        width="960"
+        height="768"
+        alt="A wooden rowing boat on a green alpine lake below limestone peaks"
+        fetchpriority="high"
+      />
+      <% if (featured) { %>
+      <a class="hero-note" href="/listings/<%= featured._id %>">
+        <span class="listing-card-kicker">Top rated right now</span>
+        <strong><%= featured.title %></strong>
+        <span class="text-muted"><%= helpers.placeName(featured.location, featured.country) %></span>
+        &middot; <span class="rating"><%- helpers.icon("star") %><%= featured.ratingAverage.toFixed(1) %></span>
+      </a>
+      <% } %>
     </div>
   </section>
   <% } else { %>
-  <section class="pt-4">
-    <a href="/listings" class="small text-decoration-none"><i class="fa-solid fa-arrow-left me-1" aria-hidden="true"></i>All stays</a>
-    <h1 class="h2 mt-2 mb-1">
-      <% if (search && category) { %><%= category %> stays matching "<%= search %>"<% } else if (search) { %>Stays matching "<%= search %>"<% } else if (category) { %><%= category %> stays<% } else { %>Explore stays<% } %>
+  <section class="page-intro">
+    <a href="/listings" class="back-link"><%- helpers.icon("arrow-left") %>All stays</a>
+    <h1>
+      <% if (search && category) { %><%= category %> stays matching "<%= search %>"<% } else if (search) { %>Stays matching "<%= search %>"<% } else if (category) { %><%= category %> stays<% } else { %>All stays<% } %>
     </h1>
   </section>
   <% } %>
 
-  <nav class="mt-4" aria-label="Categories">
-    <div class="category-bar">
-      <a class="category-chip <%= !category ? 'active' : '' %>" href="<%= buildQuery({ category: '', page: '' }) %>" <%- !category ? 'aria-current="true"' : '' %>>
-        <i class="fa-solid fa-border-all" aria-hidden="true"></i> All
-      </a>
-      <% for (const item of categories) { %>
-      <a class="category-chip <%= category === item.name ? 'active' : '' %>" href="<%= buildQuery({ category: item.name, page: '' }) %>" <%- category === item.name ? 'aria-current="true"' : '' %>>
-        <i class="<%= item.icon %>" aria-hidden="true"></i> <%= item.name %>
-      </a>
-      <% } %>
-    </div>
+  <nav class="categories" aria-label="Categories" id="stays">
+    <a class="category-link <%= !category ? 'active' : '' %>" href="<%= buildQuery({ category: '', page: '' }) %>" <%- !category ? 'aria-current="true"' : '' %>>
+      <%- helpers.icon("grid") %>All
+    </a>
+    <% for (const item of categories) { %>
+    <a class="category-link <%= category === item.name ? 'active' : '' %>" href="<%= buildQuery({ category: item.name, page: '' }) %>" <%- category === item.name ? 'aria-current="true"' : '' %>>
+      <%- helpers.icon(item.icon) %><%= item.name %>
+    </a>
+    <% } %>
   </nav>
 
   <div class="toolbar">
-    <p class="mb-0 text-muted" aria-live="polite">
-      <strong class="text-body"><%= total %></strong> <%= total === 1 ? "stay" : "stays" %> found
+    <p class="result-count" aria-live="polite">
+      <strong><%= total %></strong> <%= total === 1 ? "stay" : "stays" %>
       <% if (search || category) { %>&middot; <a href="/listings">Clear filters</a><% } %>
     </p>
     <div class="d-flex flex-wrap align-items-center gap-3">
       <div class="form-check form-switch mb-0">
         <input class="form-check-input" type="checkbox" role="switch" id="taxToggle" />
-        <label class="form-check-label" for="taxToggle">Show prices incl. GST</label>
+        <label class="form-check-label small" for="taxToggle">Prices incl. GST</label>
       </div>
       <form method="GET" action="/listings" class="d-flex align-items-center gap-2">
         <% if (search) { %><input type="hidden" name="search" value="<%= search %>" /><% } %>
         <% if (category) { %><input type="hidden" name="category" value="<%= category %>" /><% } %>
-        <label for="sortSelect" class="small text-muted text-nowrap">Sort by</label>
-        <select id="sortSelect" name="sort" class="form-select form-select-sm" data-auto-submit>
+        <label for="sortSelect" class="small text-muted text-nowrap">Sort</label>
+        <select id="sortSelect" name="sort" class="form-select" data-auto-submit>
           <% for (const [key, option] of Object.entries(sortOptions)) { %>
           <option value="<%= key %>" <%= key === sortKey ? "selected" : "" %>><%= option.label %></option>
           <% } %>
         </select>
-        <noscript><button class="btn btn-sm btn-quiet" type="submit">Apply</button></noscript>
+        <noscript><button class="btn btn-sm btn-outline" type="submit">Apply</button></noscript>
       </form>
     </div>
   </div>
 
   <% if (listings.length) { %>
   <section aria-label="Stays">
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
-      <% for (const listing of listings) { %>
-      <div class="col"><%- include("../includes/listing-card", { listing }) %></div>
-      <% } %>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4 gy-5">
+      <% listings.forEach((listing, index) => { %>
+      <div class="col"><%- include("../includes/listing-card", { listing, eagerImage: !isLanding && index < 4 }) %></div>
+      <% }) %>
     </div>
   </section>
 
   <% if (totalPages > 1) { %>
-  <nav class="mt-5" aria-label="Pagination">
-    <ul class="pagination justify-content-center flex-wrap">
-      <li class="page-item <%= page === 1 ? 'disabled' : '' %>">
-        <a class="page-link" href="<%= buildQuery({ page: page - 1 > 1 ? page - 1 : '' }) %>" aria-label="Previous page">
-          <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
-        </a>
-      </li>
+  <nav aria-label="Pagination">
+    <ul class="pager">
+      <li><a class="<%= page === 1 ? 'disabled' : '' %>" href="<%= buildQuery({ page: page - 1 > 1 ? page - 1 : '' }) %>" aria-label="Previous page"><%- helpers.icon("chevron-left") %></a></li>
       <% for (let p = 1; p <= totalPages; p++) { %>
         <% if (p === 1 || p === totalPages || Math.abs(p - page) <= 1) { %>
-        <li class="page-item <%= p === page ? 'active' : '' %>">
-          <a class="page-link" href="<%= buildQuery({ page: p > 1 ? p : '' }) %>" <%- p === page ? 'aria-current="page"' : '' %>><%= p %></a>
-        </li>
+        <li><a href="<%= buildQuery({ page: p > 1 ? p : '' }) %>" <%- p === page ? 'aria-current="page"' : '' %>><%= p %></a></li>
         <% } else if (Math.abs(p - page) === 2) { %>
-        <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+        <li><span>&hellip;</span></li>
         <% } %>
       <% } %>
-      <li class="page-item <%= page === totalPages ? 'disabled' : '' %>">
-        <a class="page-link" href="<%= buildQuery({ page: page < totalPages ? page + 1 : totalPages }) %>" aria-label="Next page">
-          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-        </a>
-      </li>
+      <li><a class="<%= page === totalPages ? 'disabled' : '' %>" href="<%= buildQuery({ page: page < totalPages ? page + 1 : totalPages }) %>" aria-label="Next page"><%- helpers.icon("chevron-right") %></a></li>
     </ul>
   </nav>
   <% } %>
   <% } else { %>
   <div class="empty-state">
-    <span class="empty-state-icon"><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i></span>
-    <h2 class="h4">No stays found</h2>
-    <p class="text-muted mb-4">
-      We could not find a stay matching your search. Try a different destination or browse every category.
-    </p>
-    <a href="/listings" class="btn btn-brand">Browse all stays</a>
+    <span class="empty-state-icon"><%- helpers.icon("map") %></span>
+    <h2>Nothing here yet</h2>
+    <p>We could not find a stay matching your search. Try another destination or browse every category.</p>
+    <a href="/listings" class="btn btn-primary">Browse all stays</a>
   </div>
   <% } %>
 
   <% if (isLanding && destinations.length) { %>
   <section class="section" aria-labelledby="destinationsTitle">
-    <div class="section-heading">
+    <div class="section-head">
       <div>
-        <span class="eyebrow">Popular right now</span>
-        <h2 id="destinationsTitle">Destinations travellers love</h2>
+        <span class="eyebrow">Destinations</span>
+        <h2 id="destinationsTitle">Where travellers are going</h2>
       </div>
+      <a href="#stays" class="link-arrow">Browse every stay <%- helpers.icon("arrow-right") %></a>
     </div>
-    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3">
-      <% for (const destination of destinations) { %>
-      <div class="col">
-        <a class="destination-card" href="/listings?search=<%= encodeURIComponent(destination._id) %>">
-          <img src="<%= helpers.imageUrl(destination.image, { width: 400, height: 500 }) %>" alt="" loading="lazy" />
-          <span class="destination-card-label">
-            <strong><%= destination._id %></strong>
-            <span class="small"><%= destination.count %> <%= destination.count === 1 ? "stay" : "stays" %></span>
-          </span>
-        </a>
-      </div>
-      <% } %>
+    <div class="destinations">
+      <% destinations.forEach((destination, index) => { %>
+      <a class="destination" href="/listings?search=<%= encodeURIComponent(destination._id) %>">
+        <img
+          src="<%= helpers.imageUrl(destination.image, index === 0 ? { width: 900, height: 1000 } : { width: 600, height: 450 }) %>"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+        <span class="destination-label">
+          <strong><%= destination._id %></strong>
+          <span><%= destination.count %> <%= destination.count === 1 ? "stay" : "stays" %></span>
+        </span>
+      </a>
+      <% }) %>
     </div>
   </section>
   <% } %>
 
   <% if (isLanding) { %>
-  <section class="section pt-0" aria-labelledby="whyTitle">
-    <div class="section-heading">
+  <section class="section pt-0" aria-labelledby="principlesTitle">
+    <div class="section-head">
       <div>
-        <span class="eyebrow">Why Travel Roots</span>
-        <h2 id="whyTitle">Booking made simple and safe</h2>
+        <span class="eyebrow">How it works</span>
+        <h2 id="principlesTitle">Booking, done properly</h2>
       </div>
     </div>
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="surface feature">
-          <span class="feature-icon"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></span>
-          <h3 class="h5">Secure payments</h3>
-          <p class="text-muted mb-0">
-            Payments are processed by Razorpay. Card details never touch our servers and every amount is verified
-            on our side before a booking is confirmed.
-          </p>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="surface feature">
-          <span class="feature-icon"><i class="fa-solid fa-star" aria-hidden="true"></i></span>
-          <h3 class="h5">Honest reviews</h3>
-          <p class="text-muted mb-0">
-            Ratings come from signed-in guests, one review per guest per stay, so you know what to expect before
-            you arrive.
-          </p>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="surface feature">
-          <span class="feature-icon"><i class="fa-solid fa-user-check" aria-hidden="true"></i></span>
-          <h3 class="h5">Hosts you can reach</h3>
-          <p class="text-muted mb-0">
-            Signed-in guests can see the host's contact details before booking, and every trip and receipt stays
-            available in your profile.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <% if (stats && stats.stays) { %>
-  <section class="surface-alt stats-strip mb-5" aria-label="Travel Roots in numbers">
-    <div><strong><%= stats.stays.toLocaleString("en-IN") %></strong><span class="text-muted">Stays listed</span></div>
-    <div><strong><%= stats.countries.toLocaleString("en-IN") %></strong><span class="text-muted">Countries</span></div>
-    <div><strong><%= stats.hosts.toLocaleString("en-IN") %></strong><span class="text-muted">Hosts</span></div>
-  </section>
-  <% } %>
-
-  <section class="cta-band" aria-labelledby="hostTitle">
-    <div class="row align-items-center g-4">
-      <div class="col-lg-8">
-        <h2 id="hostTitle" class="h3">Have a place to share?</h2>
-        <p class="mb-0">
-          List your home, cabin or farm stay in a few minutes. You set the price, and guests pay securely online.
+    <div class="principles">
+      <article class="principle">
+        <span class="principle-number">01</span>
+        <h3>Prices you can trust</h3>
+        <p>
+          The nightly rate, GST and total are worked out on our servers before you pay. Razorpay handles your card
+          details, so they never reach us.
         </p>
-      </div>
-      <div class="col-lg-4 text-lg-end">
-        <a class="btn btn-brand btn-lg" href="/listings/new">Become a host</a>
-      </div>
+      </article>
+      <article class="principle">
+        <span class="principle-number">02</span>
+        <h3>Reviews from real guests</h3>
+        <p>Only signed-in guests can review, once per stay, and hosts cannot rate their own places.</p>
+      </article>
+      <article class="principle">
+        <span class="principle-number">03</span>
+        <h3>A host you can reach</h3>
+        <p>
+          Contact details are shown before you book, and every trip and receipt stays in your profile for later.
+        </p>
+      </article>
     </div>
+  </section>
+
+  <section class="host-band" aria-labelledby="hostTitle">
+    <div>
+      <span class="eyebrow text-reset">For hosts</span>
+      <h2 id="hostTitle">Have a place worth sharing?</h2>
+      <p>List a cabin, a spare room or a whole farm in a few minutes. You set the price, guests pay online.</p>
+    </div>
+    <a class="btn btn-lg" href="/listings/new">Host your place <%- helpers.icon("arrow-right") %></a>
   </section>
   <% } %>
 </div>

@@ -31,7 +31,9 @@ function uploadImage(file) {
         folder: config.cloudinary.folder,
         resource_type: "image",
         allowed_formats: ["jpg", "jpeg", "png", "webp"],
-        transformation: [{ width: 2000, height: 2000, crop: "limit" }],
+        // Store a WebP master no larger than 2000px; delivery URLs resize further.
+        format: "webp",
+        transformation: [{ width: 2000, height: 2000, crop: "limit", quality: "auto:good" }],
       },
       (error, result) => {
         if (error) {

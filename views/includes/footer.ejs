@@ -4,22 +4,14 @@
     <div class="row g-4">
       <div class="col-lg-4 pe-lg-5">
         <a class="brand" href="/listings">
-          <span class="brand-mark" aria-hidden="true"><i class="fa-regular fa-compass"></i></span>
+          <span class="brand-mark" aria-hidden="true"><%- helpers.icon("sprout") %></span>
           <span>Travel Roots</span>
         </a>
-        <p class="mt-3 mb-0">
-          Handpicked stays from hosts who care. Discover a place that feels like home, wherever you go.
-        </p>
-        <div class="footer-social">
-          <a href="https://github.com/vk26kumar" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-            <i class="fa-brands fa-github" aria-hidden="true"></i>
-          </a>
-          <a href="https://www.linkedin.com/in/vishal-kumar2606/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-            <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
-          </a>
-          <a href="https://www.instagram.com/vk.vishal_jaiswal/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-            <i class="fa-brands fa-instagram" aria-hidden="true"></i>
-          </a>
+        <p class="footer-statement">Stays with a story, from hosts who know their place.</p>
+        <div class="social">
+          <a href="https://github.com/vk26kumar" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><%- helpers.icon("github") %></a>
+          <a href="https://www.linkedin.com/in/vishal-kumar2606/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><%- helpers.icon("linkedin") %></a>
+          <a href="https://www.instagram.com/vk.vishal_jaiswal/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><%- helpers.icon("instagram") %></a>
         </div>
       </div>
 
@@ -37,7 +29,7 @@
       <div class="col-6 col-md-3 col-lg-2">
         <h2>Hosting</h2>
         <ul>
-          <li><a href="/listings/new">List your place</a></li>
+          <li><a href="/listings/new">Host your place</a></li>
           <li><a href="/profile?tab=listings">Your listings</a></li>
           <li><a href="/profile?tab=hosting">Reservations</a></li>
           <li><a href="/terms#hosts">Host responsibilities</a></li>
@@ -67,7 +59,7 @@
 
     <div class="footer-bottom">
       <span>&copy; <%= currentYear %> Travel Roots. All rights reserved.</span>
-      <span><i class="fa-solid fa-globe me-1" aria-hidden="true"></i> English (IN) &middot; INR</span>
+      <span><%- helpers.icon("globe") %> English (IN) &middot; INR</span>
     </div>
   </div>
 </footer>

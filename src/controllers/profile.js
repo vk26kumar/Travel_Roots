@@ -5,6 +5,7 @@ const Listing = require("../models/listing");
 const Review = require("../models/review");
 const Booking = require("../models/booking");
 const { deleteImage } = require("../services/images");
+const { invalidateListingCache } = require("./listings");
 const { ACTIVE_BOOKING_STATUSES, BOOKING_STATUS } = require("../utils/constants");
 
 const TABS = ["trips", "saved", "listings", "hosting", "reviews"];
@@ -194,6 +195,7 @@ module.exports.deleteAccount = async (req, res, next) => {
     status: { $in: [BOOKING_STATUS.PENDING, BOOKING_STATUS.FAILED, BOOKING_STATUS.CANCELLED] },
   });
   await User.deleteOne({ _id: user._id });
+  invalidateListingCache();
 
   return req.logout((error) => {
     if (error) return next(error);

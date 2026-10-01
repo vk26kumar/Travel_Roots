@@ -1,5 +1,5 @@
 <%# Partials read include data directly: ejs-mate shadows `locals` with its own object. %>
 <% const starValue = Math.round(Number(typeof rating !== "undefined" ? rating : 0) || 0); %>
 <span class="stars" role="img" aria-label="Rated <%= starValue %> out of 5">
-  <% for (let i = 1; i <= 5; i++) { %><i class="<%= i <= starValue ? 'fa-solid' : 'fa-regular' %> fa-star" aria-hidden="true"></i><% } %>
+  <% for (let i = 1; i <= 5; i++) { %><%- helpers.icon("star", { className: i <= starValue ? "on" : "off" }) %><% } %>
 </span>

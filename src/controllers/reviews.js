@@ -3,6 +3,7 @@
 const Review = require("../models/review");
 const Listing = require("../models/listing");
 const ExpressError = require("../utils/ExpressError");
+const { invalidateListingCache } = require("./listings");
 
 module.exports.createReview = async (req, res) => {
   const listing = await Listing.findById(req.params.id);
@@ -29,6 +30,7 @@ module.exports.createReview = async (req, res) => {
   });
   await Listing.updateOne({ _id: listing._id }, { $push: { reviews: review._id } });
   await Listing.refreshRating(listing._id);
+  invalidateListingCache();
 
   req.flash("success", "Thanks for sharing your experience.");
   return res.redirect(`/listings/${listing._id}#reviews`);
@@ -39,6 +41,7 @@ module.exports.deleteReview = async (req, res) => {
   await Listing.updateOne({ _id: id }, { $pull: { reviews: reviewId } });
   await Review.deleteOne({ _id: reviewId });
   await Listing.refreshRating(id);
+  invalidateListingCache();
 
   req.flash("success", "Review deleted.");
   return res.redirect(`/listings/${id}#reviews`);

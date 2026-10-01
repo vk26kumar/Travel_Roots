@@ -9,92 +9,90 @@
     { key: "hosting", label: "Reservations", count: reservations.length },
     { key: "reviews", label: "Reviews", count: reviews.length },
   ];
+  const memberSince = user.createdAt ? new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric" }).format(user.createdAt) : "";
 %>
 
 <div class="container-xl">
-  <section class="surface profile-hero" aria-labelledby="profileName">
+  <section class="profile-head" aria-labelledby="profileName">
     <%- include("../includes/avatar", { user, size: "lg" }) %>
     <div class="flex-grow-1">
+      <span class="eyebrow">Your profile</span>
       <h1 id="profileName"><%= user.displayName || user.username %></h1>
       <div class="profile-meta">
-        <span><i class="fa-regular fa-user" aria-hidden="true"></i>@<%= user.username %></span>
-        <% if (user.location) { %><span><i class="fa-solid fa-location-dot" aria-hidden="true"></i><%= user.location %></span><% } %>
-        <% if (user.createdAt) { %><span><i class="fa-regular fa-calendar" aria-hidden="true"></i>Member since <%= new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric" }).format(user.createdAt) %></span><% } %>
-        <% if (user.googleId) { %><span><i class="fa-brands fa-google" aria-hidden="true"></i>Google connected</span><% } %>
-        <% if (user.githubId) { %><span><i class="fa-brands fa-github" aria-hidden="true"></i>GitHub connected</span><% } %>
+        <span><%- helpers.icon("user") %>@<%= user.username %></span>
+        <% if (user.location) { %><span><%- helpers.icon("map-pin") %><%= user.location %></span><% } %>
+        <% if (memberSince) { %><span><%- helpers.icon("calendar") %>Member since <%= memberSince %></span><% } %>
+        <% if (user.googleId) { %><span><%- helpers.icon("google") %>Google connected</span><% } %>
+        <% if (user.githubId) { %><span><%- helpers.icon("github") %>GitHub connected</span><% } %>
       </div>
-      <% if (user.bio) { %><p class="mt-3 mb-0 description"><%= user.bio %></p><% } %>
+      <% if (user.bio) { %><p class="prose mt-3 mb-0"><%= user.bio %></p><% } %>
     </div>
     <div class="d-flex flex-wrap gap-2">
-      <a href="/profile/settings" class="btn btn-quiet"><i class="fa-solid fa-pen me-2" aria-hidden="true"></i>Edit profile</a>
-      <a href="/listings/new" class="btn btn-brand"><i class="fa-solid fa-plus me-2" aria-hidden="true"></i>List a place</a>
+      <a href="/profile/settings" class="btn btn-outline"><%- helpers.icon("pencil") %>Edit profile</a>
+      <a href="/listings/new" class="btn btn-primary"><%- helpers.icon("plus") %>Host a place</a>
     </div>
   </section>
 
-  <section class="stat-grid" aria-label="Account summary">
-    <div class="surface stat-tile"><div class="label">Upcoming trips</div><div class="value"><%= stats.upcoming %></div></div>
-    <div class="surface stat-tile"><div class="label">Total trips</div><div class="value"><%= stats.trips %></div></div>
-    <div class="surface stat-tile"><div class="label">Saved stays</div><div class="value"><%= stats.saved %></div></div>
-    <div class="surface stat-tile"><div class="label">Listings</div><div class="value"><%= stats.listings %></div></div>
-    <div class="surface stat-tile"><div class="label">Total spent</div><div class="value"><%= helpers.formatINR(stats.totalSpent) %></div></div>
+  <section class="figures" aria-label="Account summary">
+    <div class="figure"><span class="value"><%= stats.upcoming %></span><span class="label">Upcoming trips</span></div>
+    <div class="figure"><span class="value"><%= stats.trips %></span><span class="label">Total trips</span></div>
+    <div class="figure"><span class="value"><%= stats.saved %></span><span class="label">Saved stays</span></div>
+    <div class="figure"><span class="value"><%= stats.listings %></span><span class="label">Listings</span></div>
+    <div class="figure"><span class="value"><%= helpers.formatINR(stats.totalSpent) %></span><span class="label">Spent on stays</span></div>
     <% if (stats.listings) { %>
-    <div class="surface stat-tile"><div class="label">Host earnings</div><div class="value"><%= helpers.formatINR(stats.totalEarned) %></div></div>
+    <div class="figure"><span class="value"><%= helpers.formatINR(stats.totalEarned) %></span><span class="label">Host earnings</span></div>
     <% } %>
   </section>
 
-  <nav class="profile-tabs" aria-label="Profile sections">
+  <nav class="tabs" aria-label="Profile sections">
     <% for (const item of tabs) { %>
-    <a href="/profile?tab=<%= item.key %>" class="<%= tab === item.key ? 'active' : '' %>" <%- tab === item.key ? 'aria-current="page"' : '' %>>
-      <%= item.label %><span class="count"><%= item.count %></span>
-    </a>
+    <a href="/profile?tab=<%= item.key %>" class="<%= tab === item.key ? 'active' : '' %>" <%- tab === item.key ? 'aria-current="page"' : '' %>><%= item.label %><span class="count"><%= item.count %></span></a>
     <% } %>
   </nav>
 
   <% if (tab === "trips") { %>
-  <section aria-labelledby="upcomingTitle">
-    <h2 id="upcomingTitle" class="h4 mb-3">Upcoming</h2>
+  <section class="tab-section" aria-labelledby="upcomingTitle">
+    <h2 id="upcomingTitle">Upcoming</h2>
     <% if (upcoming.length) { %>
-    <div class="d-grid gap-3 mb-5">
+    <div class="mb-5">
       <% for (const booking of upcoming) { %>
-      <article class="surface trip-card">
-        <img src="<%= helpers.imageUrl(booking.listing && booking.listing.image && booking.listing.image.url, { width: 320, height: 240 }) %>" alt="" loading="lazy" />
+      <article class="trip">
+        <img src="<%= helpers.imageUrl(booking.listing && booking.listing.image && booking.listing.image.url, { width: 300, height: 224 }) %>" alt="" loading="lazy" width="150" height="112" />
         <div>
-          <span class="status-badge status-<%= booking.status %> mb-2"><%= statusLabels[booking.status] %></span>
-          <h3 class="h5 mb-1"><%= booking.listing ? booking.listing.title : "Listing no longer available" %></h3>
+          <span class="status status-<%= booking.status %>"><%= statusLabels[booking.status] %></span>
+          <h3><%= booking.listing ? booking.listing.title : "Listing no longer available" %></h3>
           <% if (booking.listing) { %><p class="text-muted mb-1"><%= helpers.placeName(booking.listing.location, booking.listing.country) %></p><% } %>
           <p class="mb-0"><strong><%= helpers.formatDate(booking.fromDate) %></strong> to <strong><%= helpers.formatDate(booking.toDate) %></strong> &middot; <%= booking.nights %> <%= booking.nights === 1 ? "night" : "nights" %></p>
         </div>
         <div class="text-md-end">
-          <div class="fw-bold mb-2"><%= helpers.formatINR(booking.amount) %></div>
-          <a href="/bookings/<%= booking._id %>" class="btn btn-sm btn-outline-brand">View receipt</a>
+          <div class="fw-semibold mb-2"><%= helpers.formatINR(booking.amount) %></div>
+          <a href="/bookings/<%= booking._id %>" class="link-arrow">Receipt <%- helpers.icon("arrow-right") %></a>
         </div>
       </article>
       <% } %>
     </div>
     <% } else { %>
     <div class="empty-state mb-5">
-      <span class="empty-state-icon"><i class="fa-solid fa-suitcase-rolling" aria-hidden="true"></i></span>
-      <h3 class="h5">No upcoming trips</h3>
-      <p class="text-muted">When you book a stay it will appear here.</p>
-      <a href="/listings" class="btn btn-brand">Find a stay</a>
+      <span class="empty-state-icon"><%- helpers.icon("luggage") %></span>
+      <h3>No upcoming trips</h3>
+      <p>When you book a stay it will appear here, along with its receipt.</p>
+      <a href="/listings" class="btn btn-primary">Find a stay</a>
     </div>
     <% } %>
 
     <% if (past.length) { %>
-    <h2 class="h4 mb-3">Past and other bookings</h2>
-    <div class="table-responsive surface">
-      <table class="table align-middle mb-0">
-        <thead>
-          <tr><th scope="col">Stay</th><th scope="col">Dates</th><th scope="col">Amount</th><th scope="col">Status</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr>
-        </thead>
+    <h2>Past and other bookings</h2>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th scope="col">Stay</th><th scope="col">Dates</th><th scope="col">Amount</th><th scope="col">Status</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
         <tbody>
           <% for (const booking of past) { %>
           <tr>
             <td><%= booking.listing ? booking.listing.title : "Listing no longer available" %></td>
             <td class="text-nowrap"><%= helpers.formatDate(booking.fromDate) %> to <%= helpers.formatDate(booking.toDate) %></td>
             <td><%= helpers.formatINR(booking.amount) %></td>
-            <td><span class="status-badge status-<%= booking.status %>"><%= statusLabels[booking.status] %></span></td>
-            <td class="text-end"><a href="/bookings/<%= booking._id %>" class="btn btn-sm btn-quiet">Details</a></td>
+            <td><span class="status status-<%= booking.status %>"><%= statusLabels[booking.status] %></span></td>
+            <td class="text-end"><a href="/bookings/<%= booking._id %>">Details</a></td>
           </tr>
           <% } %>
         </tbody>
@@ -105,57 +103,55 @@
   <% } %>
 
   <% if (tab === "saved") { %>
-  <section aria-label="Saved stays">
+  <section class="tab-section" aria-label="Saved stays">
     <% if (wishlist.length) { %>
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4 gy-5">
       <% for (const listing of wishlist) { %>
       <div class="col"><%- include("../includes/listing-card", { listing }) %></div>
       <% } %>
     </div>
     <% } else { %>
     <div class="empty-state">
-      <span class="empty-state-icon"><i class="fa-regular fa-heart" aria-hidden="true"></i></span>
-      <h3 class="h5">No saved stays yet</h3>
-      <p class="text-muted">Tap the heart on any stay to save it for later.</p>
-      <a href="/listings" class="btn btn-brand">Explore stays</a>
+      <span class="empty-state-icon"><%- helpers.icon("heart") %></span>
+      <h3>No saved stays yet</h3>
+      <p>Tap the heart on any stay to keep it here for later.</p>
+      <a href="/listings" class="btn btn-primary">Explore stays</a>
     </div>
     <% } %>
   </section>
   <% } %>
 
   <% if (tab === "listings") { %>
-  <section aria-label="Your listings">
+  <section class="tab-section" aria-label="Your listings">
     <% if (listings.length) { %>
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 gy-5">
       <% for (const listing of listings) { %>
       <div class="col">
         <%- include("../includes/listing-card", { listing }) %>
-        <div class="card-actions d-flex gap-2 mt-2">
-          <a href="/listings/<%= listing._id %>/edit" class="btn btn-sm btn-quiet"><i class="fa-solid fa-pen me-1" aria-hidden="true"></i>Edit</a>
-          <a href="/listings/<%= listing._id %>" class="btn btn-sm btn-quiet">View</a>
+        <div class="card-actions d-flex gap-2 mt-3">
+          <a href="/listings/<%= listing._id %>/edit" class="btn btn-sm btn-outline"><%- helpers.icon("pencil") %>Edit</a>
+          <a href="/listings/<%= listing._id %>" class="btn btn-sm btn-ghost">View</a>
         </div>
       </div>
       <% } %>
     </div>
     <% } else { %>
     <div class="empty-state">
-      <span class="empty-state-icon"><i class="fa-solid fa-house-chimney" aria-hidden="true"></i></span>
-      <h3 class="h5">You are not hosting yet</h3>
-      <p class="text-muted">Share your place with travellers and earn on your own schedule.</p>
-      <a href="/listings/new" class="btn btn-brand">List your place</a>
+      <span class="empty-state-icon"><%- helpers.icon("house-plus") %></span>
+      <h3>You are not hosting yet</h3>
+      <p>Share your place with travellers and earn on your own schedule.</p>
+      <a href="/listings/new" class="btn btn-primary">Host your place</a>
     </div>
     <% } %>
   </section>
   <% } %>
 
   <% if (tab === "hosting") { %>
-  <section aria-label="Reservations">
+  <section class="tab-section" aria-label="Reservations">
     <% if (reservations.length) { %>
-    <div class="table-responsive surface">
-      <table class="table align-middle mb-0">
-        <thead>
-          <tr><th scope="col">Guest</th><th scope="col">Listing</th><th scope="col">Dates</th><th scope="col">Nights</th><th scope="col">Payout</th><th scope="col">Status</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr>
-        </thead>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th scope="col">Guest</th><th scope="col">Listing</th><th scope="col">Dates</th><th scope="col">Nights</th><th scope="col">Payout</th><th scope="col">Status</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
         <tbody>
           <% for (const booking of reservations) { %>
           <tr>
@@ -164,53 +160,51 @@
             <td class="text-nowrap"><%= helpers.formatDate(booking.fromDate) %> to <%= helpers.formatDate(booking.toDate) %></td>
             <td><%= booking.nights %></td>
             <td><%= helpers.formatINR(booking.subtotal != null ? booking.subtotal : booking.amount) %></td>
-            <td><span class="status-badge status-<%= booking.status %>"><%= statusLabels[booking.status] %></span></td>
-            <td class="text-end"><a href="/bookings/<%= booking._id %>" class="btn btn-sm btn-quiet">Details</a></td>
+            <td><span class="status status-<%= booking.status %>"><%= statusLabels[booking.status] %></span></td>
+            <td class="text-end"><a href="/bookings/<%= booking._id %>">Details</a></td>
           </tr>
           <% } %>
         </tbody>
       </table>
     </div>
-    <p class="small text-muted mt-2">Payout shows the accommodation amount before GST.</p>
+    <p class="small text-muted mt-3">Payout is the accommodation amount before GST.</p>
     <% } else { %>
     <div class="empty-state">
-      <span class="empty-state-icon"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i></span>
-      <h3 class="h5">No reservations yet</h3>
-      <p class="text-muted"><%= listings.length ? "Confirmed bookings for your listings will appear here." : "List a place to start receiving reservations." %></p>
-      <% if (!listings.length) { %><a href="/listings/new" class="btn btn-brand">List your place</a><% } %>
+      <span class="empty-state-icon"><%- helpers.icon("calendar-check") %></span>
+      <h3>No reservations yet</h3>
+      <p><%= listings.length ? "Confirmed bookings for your listings will appear here." : "Host a place to start receiving reservations." %></p>
+      <% if (!listings.length) { %><a href="/listings/new" class="btn btn-primary">Host your place</a><% } %>
     </div>
     <% } %>
   </section>
   <% } %>
 
   <% if (tab === "reviews") { %>
-  <section aria-label="Your reviews">
+  <section class="tab-section" aria-label="Your reviews">
     <% if (reviews.length) { %>
-    <div class="row row-cols-1 row-cols-md-2 g-3">
+    <div class="reviews">
       <% for (const review of reviews) { %>
-      <div class="col">
-        <article class="surface review">
-          <div class="d-flex justify-content-between gap-2 mb-2">
-            <div>
-              <% if (review.listing && review.listingTitle) { %>
-              <a href="/listings/<%= review.listing %>#reviews" class="fw-bold"><%= review.listingTitle %></a>
-              <% } else { %>
-              <span class="fw-bold">A stay</span>
-              <% } %>
-              <div class="small text-muted"><%= helpers.formatDate(review.createdAt) %></div>
-            </div>
-            <%- include("../includes/stars", { rating: review.rating }) %>
+      <article class="review">
+        <div class="d-flex justify-content-between gap-2">
+          <div>
+            <% if (review.listing && review.listingTitle) { %>
+            <a href="/listings/<%= review.listing %>#reviews" class="fw-semibold"><%= review.listingTitle %></a>
+            <% } else { %>
+            <span class="fw-semibold">A stay</span>
+            <% } %>
+            <div class="small text-muted"><%= helpers.formatDate(review.createdAt) %></div>
           </div>
-          <p class="mb-0 description"><%= review.comment %></p>
-        </article>
-      </div>
+          <%- include("../includes/stars", { rating: review.rating }) %>
+        </div>
+        <p><%= review.comment %></p>
+      </article>
       <% } %>
     </div>
     <% } else { %>
     <div class="empty-state">
-      <span class="empty-state-icon"><i class="fa-regular fa-star" aria-hidden="true"></i></span>
-      <h3 class="h5">No reviews yet</h3>
-      <p class="text-muted">After a stay, share your experience to help other travellers.</p>
+      <span class="empty-state-icon"><%- helpers.icon("star") %></span>
+      <h3>No reviews yet</h3>
+      <p>After a stay, share your experience to help other travellers.</p>
     </div>
     <% } %>
   </section>

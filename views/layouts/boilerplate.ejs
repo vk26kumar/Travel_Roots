@@ -3,12 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title><%= title ? `${title} | Travel Roots` : "Travel Roots | Discover and book unique stays" %></title>
+    <title><%= title ? `${title} | Travel Roots` : "Travel Roots | Stays with a story" %></title>
     <meta
       name="description"
       content="<%= description || 'Travel Roots helps you discover handpicked stays, connect with hosts and book securely online.' %>"
     />
-    <meta name="theme-color" content="#e0364a" />
+    <meta name="theme-color" content="#f7f4ee" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#121310" media="(prefers-color-scheme: dark)" />
     <meta property="og:site_name" content="Travel Roots" />
     <meta property="og:title" content="<%= title || 'Travel Roots' %>" />
     <meta property="og:type" content="website" />
@@ -16,17 +17,14 @@
     <meta name="csrf-token" content="<%= csrfToken() %>" />
     <% } %>
     <link rel="icon" href="/images/favicon.svg" type="image/svg+xml" />
-    <script src="/js/theme.js?v=<%= assetVersion %>"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-    />
-    <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css?v=<%= assetVersion %>" />
-    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css?v=<%= assetVersion %>" />
+    <script src="<%= helpers.asset('/js/theme.js') %>"></script>
+    <link rel="preload" href="/vendor/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/vendor/fonts/fraunces-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preconnect" href="https://images.unsplash.com" />
+    <link rel="preconnect" href="https://res.cloudinary.com" />
+    <link rel="stylesheet" href="<%= helpers.asset('/vendor/bootstrap/bootstrap.min.css') %>" />
     <%- block("head").toString() %>
-    <link rel="stylesheet" href="/css/app.css?v=<%= assetVersion %>" />
+    <link rel="stylesheet" href="<%= helpers.asset('/css/app.css') %>" />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
@@ -41,8 +39,7 @@
     <%- include("../includes/footer") %>
     <%- include("../includes/cookie-banner") %>
 
-    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js?v=<%= assetVersion %>"></script>
-    <script src="/js/app.js?v=<%= assetVersion %>"></script>
+    <script src="<%= helpers.asset('/js/app.js') %>" defer></script>
     <%- block("scripts").toString() %>
   </body>
 </html>

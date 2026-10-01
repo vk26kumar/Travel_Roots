@@ -34,4 +34,4 @@ async function geocode(location, country) {
   return { ...DEFAULT_COORDINATES };
 }
 
-module.exports = { geocode, DEFAULT_COORDINATES };
+module.exports = { geocode };
