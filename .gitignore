@@ -1,2 +1,22 @@
-.env
+# Dependencies
 node_modules/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Test and coverage output
+coverage/
+.nyc_output/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
