@@ -1,0 +1,106 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container-xl">
+  <article class="legal">
+    <span class="eyebrow">Legal</span>
+    <h1>Terms of Service</h1>
+    <p class="text-muted">Last updated: <%= lastUpdated %></p>
+    <p>
+      These terms govern your use of Travel Roots. By creating an account, publishing a listing or booking a stay
+      you agree to them. If you do not agree, please do not use the service.
+    </p>
+
+    <nav class="surface-alt legal-toc" aria-label="On this page">
+      <ol>
+        <li><a href="#accounts">Accounts</a></li>
+        <li><a href="#role">Our role</a></li>
+        <li><a href="#hosts">Host responsibilities</a></li>
+        <li><a href="#guests">Guest responsibilities</a></li>
+        <li><a href="#payments">Bookings and payments</a></li>
+        <li><a href="#content">Reviews and content</a></li>
+        <li><a href="#conduct">Prohibited conduct</a></li>
+        <li><a href="#termination">Suspension and termination</a></li>
+        <li><a href="#liability">Disclaimers and liability</a></li>
+        <li><a href="#general">General</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="accounts">1. Accounts</h2>
+    <p>
+      You must be at least 18 years old to use Travel Roots. Provide accurate information, keep your password
+      confidential and let us know straight away if you think your account has been used without permission. You
+      are responsible for activity on your account.
+    </p>
+
+    <h2 id="role">2. Our role</h2>
+    <p>
+      Travel Roots is a platform that connects hosts who offer stays with guests who want to book them. Hosts are
+      responsible for their listings and for providing the stay. We are not the owner or operator of any listed
+      property.
+    </p>
+
+    <h2 id="hosts">3. Host responsibilities</h2>
+    <ul>
+      <li>Only list places you own or are authorised to rent out.</li>
+      <li>Describe your place accurately, use your own photos and keep prices and contact details up to date.</li>
+      <li>Comply with local laws, permits, safety requirements and tax obligations that apply to short-term stays.</li>
+      <li>Honour confirmed bookings and respond to guests promptly.</li>
+      <li>A listing with upcoming confirmed stays cannot be deleted until those stays are complete.</li>
+    </ul>
+
+    <h2 id="guests">4. Guest responsibilities</h2>
+    <ul>
+      <li>Treat the property and neighbours with respect and follow the host's house rules.</li>
+      <li>Use the place only for the dates and purpose you booked.</li>
+      <li>You are responsible for damage caused during your stay.</li>
+    </ul>
+
+    <h2 id="payments">5. Bookings and payments</h2>
+    <ul>
+      <li>Prices are shown per night in Indian Rupees. GST at <%= Math.round(taxRate * 100) %>% is added to the accommodation total at checkout.</li>
+      <li>Payments are processed by Razorpay. A booking is confirmed only after the payment has been verified by our servers.</li>
+      <li>Stays can be booked for up to 30 nights and up to 365 days in advance. Dates that overlap an existing confirmed booking cannot be booked.</li>
+      <li>Cancellations, changes and refunds are agreed between the guest and the host. Use the host contact details on your booking to arrange them.</li>
+      <li>If you were charged but did not receive a confirmation, contact <a href="mailto:<%= supportEmail %>"><%= supportEmail %></a> with your booking reference.</li>
+    </ul>
+
+    <h2 id="content">6. Reviews and content</h2>
+    <p>
+      You keep ownership of the content you post, such as listings, photos and reviews. By posting it you give
+      Travel Roots a non-exclusive, royalty-free licence to host, display and adapt it for the purpose of operating
+      and promoting the service. Reviews must reflect a genuine experience. We may remove content that breaks these
+      terms or the law.
+    </p>
+
+    <h2 id="conduct">7. Prohibited conduct</h2>
+    <ul>
+      <li>Posting false, misleading, discriminatory, abusive or illegal content.</li>
+      <li>Attempting to take payments outside the platform in a way that misleads other users.</li>
+      <li>Interfering with the service, probing for vulnerabilities without permission, scraping or automated abuse.</li>
+      <li>Using another person's account or identity.</li>
+    </ul>
+
+    <h2 id="termination">8. Suspension and termination</h2>
+    <p>
+      You can delete your account at any time from Account settings. We may suspend or close accounts that break
+      these terms or put other users at risk. Terms that by their nature should survive, such as payment
+      obligations and limitations of liability, continue after termination.
+    </p>
+
+    <h2 id="liability">9. Disclaimers and liability</h2>
+    <p>
+      The service is provided "as is". We work to keep it available and accurate but do not guarantee that it will
+      be uninterrupted or error-free, or that listings are accurate. To the extent permitted by law, Travel Roots is
+      not liable for indirect or consequential losses, and our total liability for any claim is limited to the fees
+      you paid through the platform for the booking concerned. Nothing in these terms limits liability that cannot
+      be limited by law.
+    </p>
+
+    <h2 id="general">10. General</h2>
+    <p>
+      These terms are governed by the laws of India. We may update them from time to time; if a change is
+      significant we will give notice on the website. Continued use after a change means you accept the updated
+      terms. Questions can be sent to <a href="mailto:<%= supportEmail %>"><%= supportEmail %></a>.
+    </p>
+  </article>
+</div>

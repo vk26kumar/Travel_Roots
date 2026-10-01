@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /listings
+Disallow: /profile
+Disallow: /bookings
+Disallow: /reset-password
+Disallow: /webhook

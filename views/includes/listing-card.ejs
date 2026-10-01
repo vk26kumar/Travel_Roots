@@ -1,0 +1,57 @@
+<%# Partials read include data directly: ejs-mate shadows `locals` with its own object. %>
+<%
+  const card = listing;
+  const cardId = card._id.toString();
+  const isSaved = typeof saved !== "undefined" && saved && saved.has(cardId);
+  const priceWithTax = Math.round(card.price * (1 + taxRate));
+%>
+<article class="listing-card">
+  <div class="listing-card-media">
+    <img
+      src="<%= helpers.imageUrl(card.image && card.image.url, { width: 640, height: 480 }) %>"
+      alt="<%= card.title %>"
+      loading="lazy"
+      decoding="async"
+      width="640"
+      height="480"
+    />
+    <% if (card.ratingCount === 0 || !card.ratingCount) { %>
+    <span class="listing-card-badge">New</span>
+    <% } else if (card.ratingAverage >= 4.5 && card.ratingCount >= 2) { %>
+    <span class="listing-card-badge">Guest favourite</span>
+    <% } %>
+  </div>
+
+  <% if (currUser) { %>
+  <button
+    type="button"
+    class="wishlist-btn"
+    data-wishlist-id="<%= cardId %>"
+    aria-pressed="<%= isSaved ? 'true' : 'false' %>"
+    aria-label="<%= isSaved ? 'Remove from saved stays' : 'Save to wishlist' %>"
+  >
+    <i class="fa-regular fa-heart" aria-hidden="true"></i>
+    <i class="fa-solid fa-heart" aria-hidden="true"></i>
+  </button>
+  <% } else { %>
+  <a class="wishlist-btn" href="/login" aria-pressed="false" aria-label="Sign in to save this stay">
+    <i class="fa-regular fa-heart" aria-hidden="true"></i>
+  </a>
+  <% } %>
+
+  <div class="listing-card-body">
+    <div class="d-flex justify-content-between gap-2">
+      <h3 class="listing-card-title text-truncate">
+        <a href="/listings/<%= cardId %>"><%= helpers.placeName(card.location, card.country) %></a>
+      </h3>
+      <% if (card.ratingCount > 0) { %>
+      <span class="rating"><i class="fa-solid fa-star" aria-hidden="true"></i><%= card.ratingAverage.toFixed(1) %><span class="visually-hidden"> out of 5 from <%= card.ratingCount %> reviews</span></span>
+      <% } %>
+    </div>
+    <p class="listing-card-subtitle"><%= card.title %></p>
+    <p class="listing-card-price">
+      <span class="tax-hide"><strong><%= helpers.formatINR(card.price) %></strong> night</span>
+      <span class="tax-info"><strong class="text-body"><%= helpers.formatINR(priceWithTax) %></strong> night incl. GST</span>
+    </p>
+  </div>
+</article>

@@ -1,203 +1,112 @@
-<style>
-/* ===== NAVBAR CORE ===== */
-.navbar {
-  background: rgba(255, 255, 255, 0.96) !important;
-  backdrop-filter: blur(16px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-  padding: 0.65rem 1.4rem;
-  font-family: "Inter", system-ui, sans-serif;
-}
+<%
+  const isActive = (prefix) => currentPath === prefix || currentPath.startsWith(`${prefix}/`);
+%>
+<header class="site-header sticky-top">
+  <nav class="navbar navbar-expand-lg" aria-label="Primary">
+    <div class="container-xl">
+      <a class="brand me-lg-4" href="/listings" aria-label="Travel Roots home">
+        <span class="brand-mark" aria-hidden="true"><i class="fa-regular fa-compass"></i></span>
+        <span>Travel Roots</span>
+      </a>
 
-/* ===== BRAND ===== */
-.navbar-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  font-weight: 800;
-  text-decoration: none;
-}
-
-.navbar-brand i {
-  font-size: 1.6rem;
-  color: #fe424d;
-}
-
-.travel {
-  font-size: 1.45rem;
-  font-weight: 800;
-  color: #fe424d;
-  margin: 0;
-  letter-spacing: -0.4px;
-}
-
-/* ===== NAV LINKS ===== */
-.navbar-nav .nav-link {
-  font-weight: 600;
-  color: #2b2b2b;
-  padding: 0.45rem 0.95rem;
-  border-radius: 999px;
-  transition: all 0.25s ease;
-}
-
-.navbar-nav .nav-link:hover {
-  background: rgba(254, 66, 77, 0.12);
-  color: #fe424d;
-  transform: translateY(-1px);
-}
-
-/* ===== SEARCH BAR ===== */
-form[role="search"] {
-  background: #fff;
-  padding: 0.3rem;
-  border-radius: 999px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-  display: flex;
-  align-items: center;
-}
-
-.search-inp {
-  border: none;
-  outline: none;
-  padding: 0.6rem 1rem;
-  font-size: 0.95rem;
-  border-radius: 999px;
-  width: 220px;
-}
-
-.search-inp::placeholder {
-  color: #aaa;
-}
-
-.btn-search {
-  background: linear-gradient(135deg, #fe424d, #ff6b73);
-  color: #fff;
-  border-radius: 999px;
-  padding: 0.55rem 1.35rem;
-  font-weight: 600;
-  border: none;
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  transition: all 0.25s ease;
-}
-
-.btn-search:hover {
-  box-shadow: 0 10px 25px rgba(254, 66, 77, 0.45);
-  transform: translateY(-1px);
-}
-
-/* ===== PROFILE ICON ===== */
-.fa-circle-user {
-  color: #fe424d;
-  margin-left: 0.6rem;
-  cursor: pointer;
-  transition: transform 0.25s ease;
-}
-
-.fa-circle-user:hover {
-  transform: scale(1.15);
-}
-
-/* ===== TOGGLER ===== */
-.navbar-toggler {
-  border: none;
-}
-
-.navbar-toggler:focus {
-  box-shadow: none;
-}
-
-/* ===== ALIGNMENT ===== */
-.navbar-nav.ms-auto {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-/* ===== MOBILE ===== */
-@media (max-width: 768px) {
-  form[role="search"] {
-    width: 100%;
-    margin: 0.8rem 0;
-  }
-
-  .search-inp {
-    width: 100%;
-  }
-
-  .navbar-nav {
-    gap: 0.5rem;
-  }
-}
-
-
-</style>
-
-<nav class="navbar navbar-expand-md bg-body-tertiary border-bottom sticky-top ">
-    <div class="container-fluid">
-      <span>
-        <a class="navbar-brand" href="/listings">
-          <i class="fa-regular fa-compass"></i>
-          <span class="travel">Travel Roots</span>
-        </a>
-      </span>
-      
-
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-
-
-
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-          <a class="nav-link" href="/listings"><b>Explore</b></a>
-        </div>
-
-
-
-        <div class="navbar-nav ms-auto">
-          <form class="d-flex" role="search" action="/listings" method="GET">
-              <input 
-                  class="form-control me-2 search-inp" 
-                  type="search" 
-                  name="search"  
-                  id="searchInput" 
-                  placeholder="Search by Location"
-                  value="<%= searchQuery %>">
-              <button class="btn btn-search" type="submit">
-                  <i class="fa-solid fa-magnifying-glass"></i>
-                  Search
-              </button>
-          </form>
+      <div class="d-flex align-items-center gap-2 d-lg-none">
+        <button class="btn btn-quiet btn-icon" type="button" data-theme-toggle aria-label="Toggle dark mode">
+          <i class="fa-solid fa-moon" aria-hidden="true"></i>
+        </button>
+        <button
+          class="navbar-toggler border-0 shadow-none"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#primaryNav"
+          aria-controls="primaryNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
       </div>
-      
 
-        
+      <div class="collapse navbar-collapse" id="primaryNav">
+        <ul class="navbar-nav me-lg-3">
+          <li class="nav-item">
+            <a class="nav-link <%= currentPath === '/listings' ? 'active' : '' %>" href="/listings" <%- currentPath === '/listings' ? 'aria-current="page"' : '' %>>Explore</a>
+          </li>
+        </ul>
 
-        <div class="navbar-nav ms-auto">
-          <a class="nav-link" href="/listings/new"><b>Add your place</b></a>
-          <% if(!currUser) { %>
-            <a class="nav-link " aria-current="page" href="/signup"><b>Signup</b></a>
-            <a class="nav-link " aria-current="page" href="/signup"><b>Login</b></a>
+        <form class="nav-search mx-lg-auto" role="search" action="/listings" method="GET">
+          <label for="navSearch" class="visually-hidden">Search destinations</label>
+          <input
+            id="navSearch"
+            type="search"
+            name="search"
+            placeholder="Search a city, country or stay"
+            value="<%= searchQuery %>"
+            autocomplete="off"
+            maxlength="100"
+          />
+          <button type="submit" aria-label="Search">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          </button>
+        </form>
+
+        <ul class="navbar-nav align-items-lg-center gap-lg-1 ms-lg-3">
+          <li class="nav-item">
+            <a class="nav-link <%= isActive('/listings/new') ? 'active' : '' %>" href="/listings/new">
+              <i class="fa-solid fa-house-chimney me-1" aria-hidden="true"></i> List your place
+            </a>
+          </li>
+          <li class="nav-item d-none d-lg-block">
+            <button class="btn btn-quiet btn-icon border-0" type="button" data-theme-toggle aria-label="Toggle dark mode">
+              <i class="fa-solid fa-moon" aria-hidden="true"></i>
+            </button>
+          </li>
+
+          <% if (currUser) { %>
+          <li class="nav-item dropdown mt-2 mt-lg-0">
+            <button
+              class="user-menu-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+              data-bs-display="static"
+              aria-expanded="false"
+              aria-label="Account menu"
+            >
+              <i class="fa-solid fa-bars" aria-hidden="true"></i>
+              <%- include("avatar", { user: currUser, size: "sm", decorative: true }) %>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-lg-end">
+              <li class="dropdown-header-user">
+                <div class="fw-bold text-truncate"><%= currUser.displayName || currUser.username %></div>
+                <div class="small text-muted text-truncate"><%= currUser.email %></div>
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li><a class="dropdown-item" href="/profile"><i class="fa-regular fa-user" aria-hidden="true"></i>Profile</a></li>
+              <li><a class="dropdown-item" href="/profile?tab=trips"><i class="fa-solid fa-suitcase-rolling" aria-hidden="true"></i>Trips</a></li>
+              <li><a class="dropdown-item" href="/profile?tab=saved"><i class="fa-regular fa-heart" aria-hidden="true"></i>Saved stays</a></li>
+              <li><a class="dropdown-item" href="/profile?tab=listings"><i class="fa-solid fa-house" aria-hidden="true"></i>Your listings</a></li>
+              <li><a class="dropdown-item" href="/profile?tab=hosting"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i>Reservations</a></li>
+              <li><a class="dropdown-item" href="/profile/settings"><i class="fa-solid fa-gear" aria-hidden="true"></i>Account settings</a></li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <form action="/logout" method="POST">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken() %>" />
+                  <button class="dropdown-item" type="submit">
+                    <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>Sign out
+                  </button>
+                </form>
+              </li>
+            </ul>
+          </li>
+          <% } else { %>
+          <li class="nav-item">
+            <a class="nav-link <%= currentPath === '/login' ? 'active' : '' %>" href="/login">Sign in</a>
+          </li>
+          <li class="nav-item mt-2 mt-lg-0">
+            <a class="btn btn-brand" href="/signup">Sign up</a>
+          </li>
           <% } %>
-          <% if(currUser) { %>
-          <a class="nav-link" href="/logout "><b>Logout</b></a>
-          <a href="/dashboard" class="nav-link"><b>Profile</b></a>
-          <i class="fa-solid fa-circle-user fa-2x"></i>
-          <% } %>
-          
-        </div>
-        
+        </ul>
       </div>
-      
-  </div>
-</nav>
-
-
-
-
-
-
-
+    </div>
+  </nav>
+</header>

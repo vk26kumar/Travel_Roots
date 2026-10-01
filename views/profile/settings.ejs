@@ -1,0 +1,137 @@
+<% layout("/layouts/boilerplate") %>
+<% const user = currUser; %>
+
+<div class="container-xl">
+  <header class="pt-4 pb-3">
+    <a href="/profile" class="small text-decoration-none"><i class="fa-solid fa-arrow-left me-1" aria-hidden="true"></i>Back to profile</a>
+    <h1 class="h2 mt-2">Account settings</h1>
+  </header>
+
+  <div class="row g-4">
+    <nav class="col-lg-3" aria-label="Settings sections">
+      <div class="surface p-2 settings-nav">
+        <a href="#profile"><i class="fa-regular fa-id-card" aria-hidden="true"></i>Profile</a>
+        <a href="#security"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>Sign-in and security</a>
+        <a href="#privacy"><i class="fa-solid fa-cookie-bite" aria-hidden="true"></i>Privacy</a>
+        <a href="#danger"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>Delete account</a>
+      </div>
+    </nav>
+
+    <div class="col-lg-9">
+      <section id="profile" class="surface settings-card" aria-labelledby="profileTitle">
+        <div class="d-flex align-items-center gap-3 mb-4">
+          <%- include("../includes/avatar", { user, size: "md" }) %>
+          <div>
+            <h2 id="profileTitle" class="mb-0">Profile</h2>
+            <p class="text-muted mb-0 small">This information appears on your listings and reviews.</p>
+          </div>
+        </div>
+        <form method="POST" action="/profile?_method=PUT" class="needs-validation" novalidate>
+          <input type="hidden" name="_csrf" value="<%= csrfToken() %>" />
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="settingsUsername">Username</label>
+              <input id="settingsUsername" type="text" class="form-control" value="<%= user.username %>" disabled />
+              <div class="form-hint">Usernames cannot be changed.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="displayName">Display name</label>
+              <input id="displayName" name="displayName" type="text" class="form-control" value="<%= user.displayName || '' %>" maxlength="60" placeholder="How hosts and guests see you" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="settingsEmail">Email</label>
+              <input id="settingsEmail" name="email" type="email" class="form-control" value="<%= user.email %>" maxlength="254" required />
+              <div class="invalid-feedback">Please enter a valid email address.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="settingsPhone">Phone</label>
+              <input id="settingsPhone" name="phone" type="tel" class="form-control" value="<%= user.phone || '' %>" pattern="\+?[0-9\s\-]{7,20}" placeholder="+91 98765 43210" />
+              <div class="invalid-feedback">Enter a valid phone number.</div>
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="settingsLocation">Location</label>
+              <input id="settingsLocation" name="location" type="text" class="form-control" value="<%= user.location || '' %>" maxlength="100" placeholder="City, Country" />
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="settingsBio">About you</label>
+              <textarea id="settingsBio" name="bio" rows="4" class="form-control" maxlength="500" placeholder="Tell hosts and guests a little about yourself."><%= user.bio || '' %></textarea>
+              <div class="form-hint">Up to 500 characters.</div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-brand mt-4">Save profile</button>
+        </form>
+      </section>
+
+      <section id="security" class="surface settings-card" aria-labelledby="securityTitle">
+        <h2 id="securityTitle"><%= hasPassword ? "Change password" : "Set a password" %></h2>
+        <p class="text-muted">
+          <%= hasPassword ? "Use a password you do not use anywhere else." : "You signed up with a social account. Add a password to also sign in with your username." %>
+        </p>
+        <form method="POST" action="/profile/password?_method=PUT" class="needs-validation" novalidate>
+          <input type="hidden" name="_csrf" value="<%= csrfToken() %>" />
+          <div class="row g-3">
+            <% if (hasPassword) { %>
+            <div class="col-12">
+              <label class="form-label" for="currentPassword">Current password</label>
+              <input id="currentPassword" name="currentPassword" type="password" class="form-control" autocomplete="current-password" maxlength="128" required />
+              <div class="invalid-feedback">Please enter your current password.</div>
+            </div>
+            <% } %>
+            <div class="col-md-6">
+              <label class="form-label" for="newPassword">New password</label>
+              <input id="newPassword" name="newPassword" type="password" class="form-control" autocomplete="new-password" minlength="8" maxlength="128" pattern="(?=.*[A-Za-z])(?=.*[0-9]).{8,}" required />
+              <div class="invalid-feedback">At least 8 characters with a letter and a number.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="confirmPassword">Confirm new password</label>
+              <input id="confirmPassword" name="confirmPassword" type="password" class="form-control" autocomplete="new-password" maxlength="128" required />
+              <div class="invalid-feedback">Please confirm your new password.</div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-brand mt-4"><%= hasPassword ? "Update password" : "Set password" %></button>
+        </form>
+
+        <hr class="my-4" />
+        <h3 class="h6">Connected accounts</h3>
+        <ul class="list-unstyled mb-0">
+          <li class="d-flex justify-content-between py-2">
+            <span><i class="fa-brands fa-google me-2" aria-hidden="true"></i>Google</span>
+            <span class="text-muted"><%= user.googleId ? "Connected" : "Not connected" %></span>
+          </li>
+          <li class="d-flex justify-content-between py-2">
+            <span><i class="fa-brands fa-github me-2" aria-hidden="true"></i>GitHub</span>
+            <span class="text-muted"><%= user.githubId ? "Connected" : "Not connected" %></span>
+          </li>
+        </ul>
+      </section>
+
+      <section id="privacy" class="surface settings-card" aria-labelledby="privacyTitle">
+        <h2 id="privacyTitle">Privacy</h2>
+        <p class="text-muted">
+          Control optional preference storage on this device and read how we handle your information.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <button type="button" class="btn btn-quiet" data-cookie-settings>Cookie settings</button>
+          <a href="/privacy" class="btn btn-quiet">Privacy Policy</a>
+          <a href="/cookies" class="btn btn-quiet">Cookie Policy</a>
+        </div>
+      </section>
+
+      <section id="danger" class="surface settings-card danger-zone" aria-labelledby="dangerTitle">
+        <h2 id="dangerTitle" class="text-danger">Delete account</h2>
+        <p class="text-muted">
+          This permanently removes your profile, listings, reviews and saved stays. Records of completed payments are
+          kept for accounting and legal purposes but are no longer linked to a profile. This cannot be undone.
+        </p>
+        <form method="POST" action="/profile?_method=DELETE" class="needs-validation" novalidate data-confirm="Permanently delete your Travel Roots account?">
+          <input type="hidden" name="_csrf" value="<%= csrfToken() %>" />
+          <label class="form-label" for="confirmUsername">Type <strong><%= user.username %></strong> to confirm</label>
+          <div class="d-flex flex-wrap gap-2">
+            <input id="confirmUsername" name="confirmUsername" type="text" class="form-control w-auto flex-grow-1" autocomplete="off" required />
+            <button type="submit" class="btn btn-danger">Delete my account</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,193 @@
+<% layout("/layouts/boilerplate") %>
+<% block("head").append('<link rel="stylesheet" href="/vendor/leaflet/leaflet.css" />') %>
+<% block("scripts").append('<script src="/vendor/leaflet/leaflet.js"></script>') %>
+<% block("scripts").append(`<script src="/js/map.js?v=${assetVersion}"></script>`) %>
+<%
+  const listingId = listing._id.toString();
+  const isSaved = saved.has(listingId);
+  const host = listing.owner;
+  const coords = listing.coordinates && Number.isFinite(listing.coordinates.lat) ? listing.coordinates : { lat: 28.6139, lon: 77.209 };
+%>
+
+<div class="container-xl">
+  <header class="detail-header">
+    <a href="/listings" class="small text-decoration-none"><i class="fa-solid fa-arrow-left me-1" aria-hidden="true"></i>Back to stays</a>
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mt-2 mb-3">
+      <div>
+        <h1 class="mb-2"><%= listing.title %></h1>
+        <div class="detail-meta">
+          <% if (listing.ratingCount > 0) { %>
+          <span class="rating"><i class="fa-solid fa-star" aria-hidden="true"></i><%= listing.ratingAverage.toFixed(1) %>
+            <a href="#reviews" class="text-body"><%= listing.ratingCount %> <%= listing.ratingCount === 1 ? "review" : "reviews" %></a></span>
+          <% } else { %>
+          <span class="rating"><i class="fa-regular fa-star" aria-hidden="true"></i>New listing</span>
+          <% } %>
+          <span class="dot"><i class="fa-solid fa-location-dot me-1" aria-hidden="true"></i><%= helpers.placeName(listing.location, listing.country) %></span>
+          <span class="dot"><span class="badge rounded-pill text-bg-light border"><%= listing.category %></span></span>
+        </div>
+      </div>
+      <div class="d-flex gap-2">
+        <% if (currUser && !isHost) { %>
+        <button type="button" class="btn btn-quiet" data-wishlist-id="<%= listingId %>" aria-pressed="<%= isSaved ? 'true' : 'false' %>" aria-label="<%= isSaved ? 'Remove from saved stays' : 'Save to wishlist' %>">
+          <i class="fa-regular fa-heart me-1" aria-hidden="true"></i><span data-wishlist-label><%= isSaved ? "Saved" : "Save" %></span>
+        </button>
+        <% } %>
+      </div>
+    </div>
+  </header>
+
+  <div class="detail-gallery">
+    <img src="<%= helpers.imageUrl(listing.image && listing.image.url, { width: 1600, height: 800 }) %>" alt="<%= listing.title %>" />
+  </div>
+
+  <div class="row g-5 mt-1">
+    <div class="col-lg-7">
+      <section class="host-card pt-3">
+        <%- include("../includes/avatar", { user: host, size: "md" }) %>
+        <div>
+          <h2 class="h5 mb-0">Hosted by <%= host ? (host.displayName || host.username) : "a former host" %></h2>
+          <% if (host && host.createdAt) { %>
+          <span class="small text-muted">Hosting since <%= new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric" }).format(host.createdAt) %></span>
+          <% } %>
+        </div>
+      </section>
+
+      <section class="detail-section" aria-labelledby="aboutTitle">
+        <h2 id="aboutTitle">About this place</h2>
+        <p class="description mb-0"><%= listing.description %></p>
+      </section>
+
+      <section class="detail-section" aria-labelledby="factsTitle">
+        <h2 id="factsTitle">At a glance</h2>
+        <ul class="fact-list">
+          <li><i class="fa-solid fa-tag" aria-hidden="true"></i><div><strong>Category</strong><br /><span class="text-muted"><%= listing.category %></span></div></li>
+          <li><i class="fa-solid fa-location-dot" aria-hidden="true"></i><div><strong>Location</strong><br /><span class="text-muted"><%= helpers.placeName(listing.location, listing.country) %></span></div></li>
+          <li><i class="fa-solid fa-indian-rupee-sign" aria-hidden="true"></i><div><strong>Nightly rate</strong><br /><span class="text-muted"><%= helpers.formatINR(listing.price) %> plus GST</span></div></li>
+          <li><i class="fa-solid fa-lock" aria-hidden="true"></i><div><strong>Payments</strong><br /><span class="text-muted">Secured by Razorpay</span></div></li>
+        </ul>
+      </section>
+
+      <section class="detail-section" aria-labelledby="mapTitle">
+        <h2 id="mapTitle">Where you will be</h2>
+        <p class="text-muted"><%= helpers.placeName(listing.location, listing.country) %></p>
+        <div
+          id="map"
+          role="region"
+          aria-label="Map showing the approximate location of this stay"
+          data-lat="<%= coords.lat %>"
+          data-lon="<%= coords.lon %>"
+          data-label="<%= helpers.placeName(listing.location, listing.country) %>"
+        ></div>
+      </section>
+    </div>
+
+    <aside class="col-lg-5">
+      <div class="surface booking-widget">
+        <div class="d-flex justify-content-between align-items-baseline mb-3">
+          <div><span class="price"><%= helpers.formatINR(listing.price) %></span> <span class="text-muted">night</span></div>
+          <% if (listing.ratingCount > 0) { %>
+          <span class="rating"><i class="fa-solid fa-star" aria-hidden="true"></i><%= listing.ratingAverage.toFixed(1) %></span>
+          <% } %>
+        </div>
+
+        <% if (isHost) { %>
+        <p class="text-muted">This is your listing. Guests see a reservation button here.</p>
+        <div class="d-grid gap-2">
+          <a href="/listings/<%= listingId %>/edit" class="btn btn-brand"><i class="fa-solid fa-pen me-2" aria-hidden="true"></i>Edit listing</a>
+          <form method="POST" action="/listings/<%= listingId %>?_method=DELETE" data-confirm="Delete this listing permanently? Its reviews will also be removed.">
+            <input type="hidden" name="_csrf" value="<%= csrfToken() %>" />
+            <button class="btn btn-outline-danger w-100" type="submit"><i class="fa-regular fa-trash-can me-2" aria-hidden="true"></i>Delete listing</button>
+          </form>
+          <a href="/profile?tab=hosting" class="btn btn-quiet">View reservations</a>
+        </div>
+        <% } else { %>
+        <a href="/listings/<%= listingId %>/book" class="btn btn-brand btn-lg w-100">Check availability</a>
+        <p class="small text-muted text-center mt-3 mb-0">
+          Choose your dates on the next step. GST of <%= Math.round(taxRate * 100) %>% is added at checkout.
+        </p>
+        <% } %>
+      </div>
+    </aside>
+  </div>
+
+  <section class="detail-section" id="reviews" aria-labelledby="reviewsTitle">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+      <h2 id="reviewsTitle" class="review-summary mb-0">
+        <% if (listing.ratingCount > 0) { %>
+        <i class="fa-solid fa-star" aria-hidden="true"></i><%= listing.ratingAverage.toFixed(1) %>
+        <span class="text-muted fw-normal">&middot; <%= listing.ratingCount %> <%= listing.ratingCount === 1 ? "review" : "reviews" %></span>
+        <% } else { %>
+        Reviews
+        <% } %>
+      </h2>
+    </div>
+
+    <% if (currUser && !isHost && !hasReviewed) { %>
+    <div class="surface p-4 mb-4">
+      <h3 class="h5">Share your experience</h3>
+      <form method="POST" action="/listings/<%= listingId %>/reviews" class="needs-validation" novalidate>
+        <input type="hidden" name="_csrf" value="<%= csrfToken() %>" />
+        <fieldset class="mb-3">
+          <legend class="form-label mb-1">Your rating</legend>
+          <div class="star-input">
+            <% for (let value = 5; value >= 1; value--) { %>
+            <input type="radio" id="rate<%= value %>" name="review[rating]" value="<%= value %>" <%= value === 5 ? "required" : "" %> />
+            <label for="rate<%= value %>" title="<%= value %> star<%= value > 1 ? 's' : '' %>"><i class="fa-solid fa-star" aria-hidden="true"></i><span class="visually-hidden"><%= value %> star<%= value > 1 ? "s" : "" %></span></label>
+            <% } %>
+          </div>
+        </fieldset>
+        <div class="mb-3">
+          <label for="reviewComment" class="form-label">Your review</label>
+          <textarea id="reviewComment" name="review[comment]" class="form-control" rows="4" minlength="3" maxlength="1000" required placeholder="What did you enjoy? What could be better?"></textarea>
+          <div class="invalid-feedback">Please write at least a few words.</div>
+        </div>
+        <button class="btn btn-brand" type="submit">Post review</button>
+      </form>
+    </div>
+    <% } else if (!currUser) { %>
+    <p class="text-muted"><a href="/login">Sign in</a> to leave a review after your stay.</p>
+    <% } %>
+
+    <% if (reviews.length) { %>
+    <div class="row row-cols-1 row-cols-md-2 g-3">
+      <% for (const review of reviews) { %>
+      <div class="col">
+        <article class="surface review">
+          <div class="review-header">
+            <%- include("../includes/avatar", { user: review.author, size: "md", decorative: true }) %>
+            <div class="flex-grow-1">
+              <div class="fw-bold"><%= review.author.displayName || review.author.username %></div>
+              <div class="small text-muted"><%= helpers.formatDate(review.createdAt) %></div>
+            </div>
+            <% if (currUser && review.author._id.equals(currUser._id)) { %>
+            <form method="POST" action="/listings/<%= listingId %>/reviews/<%= review._id %>?_method=DELETE" data-confirm="Delete your review?">
+              <input type="hidden" name="_csrf" value="<%= csrfToken() %>" />
+              <button class="btn btn-sm btn-quiet" type="submit" aria-label="Delete your review"><i class="fa-regular fa-trash-can" aria-hidden="true"></i></button>
+            </form>
+            <% } %>
+          </div>
+          <%- include("../includes/stars", { rating: review.rating }) %>
+          <p class="mt-2 mb-0 description"><%= review.comment %></p>
+        </article>
+      </div>
+      <% } %>
+    </div>
+    <% } else { %>
+    <p class="text-muted mb-0">No reviews yet. Guests who stay here can be the first to share their experience.</p>
+    <% } %>
+  </section>
+
+  <% if (similar.length) { %>
+  <section class="section pb-0" aria-labelledby="similarTitle">
+    <div class="section-heading">
+      <h2 id="similarTitle">More <%= listing.category.toLowerCase() %> stays</h2>
+      <a href="/listings?category=<%= encodeURIComponent(listing.category) %>">See all</a>
+    </div>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+      <% for (const item of similar) { %>
+      <div class="col"><%- include("../includes/listing-card", { listing: item }) %></div>
+      <% } %>
+    </div>
+  </section>
+  <% } %>
+</div>

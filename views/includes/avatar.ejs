@@ -1,0 +1,19 @@
+<%# Partials read include data directly: ejs-mate shadows `locals` with its own object. %>
+<%
+  const avatarUser = (typeof user !== "undefined" && user) || {};
+  const avatarName = avatarUser.displayName || avatarUser.username || "Guest";
+  const avatarSize = typeof size !== "undefined" ? size : "";
+  const avatarDecorative = typeof decorative !== "undefined" && decorative;
+  const avatarClass = `avatar ${avatarSize ? `avatar-${avatarSize}` : ""}`;
+%>
+<% if (avatarUser.profilePhoto) { %>
+<img
+  class="<%= avatarClass %>"
+  src="<%= avatarUser.profilePhoto %>"
+  alt="<%= avatarDecorative ? '' : avatarName %>"
+  referrerpolicy="no-referrer"
+  loading="lazy"
+/>
+<% } else { %>
+<span class="<%= avatarClass %>" <% if (avatarDecorative) { %>aria-hidden="true"<% } else { %>role="img" aria-label="<%= avatarName %>"<% } %>><%= helpers.initials(avatarName) %></span>
+<% } %>

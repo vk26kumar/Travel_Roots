@@ -1,0 +1,20 @@
+<section
+  class="cookie-banner"
+  id="cookieBanner"
+  role="dialog"
+  aria-labelledby="cookieBannerTitle"
+  aria-describedby="cookieBannerText"
+  <%= consent ? "hidden" : "" %>
+>
+  <h2 id="cookieBannerTitle" class="mb-2">Your privacy choices</h2>
+  <p id="cookieBannerText" class="mb-3">
+    We use strictly necessary cookies to keep you signed in, protect forms and process payments. With your
+    permission we also remember display preferences such as dark mode and tax-inclusive prices on this device.
+    We do not use advertising or tracking cookies. Read our <a href="/cookies">Cookie Policy</a>.
+  </p>
+  <div class="d-flex flex-wrap gap-2 justify-content-end">
+    <a class="btn btn-quiet" href="/cookies#preferences">Customise</a>
+    <button type="button" class="btn btn-quiet" data-consent="necessary">Necessary only</button>
+    <button type="button" class="btn btn-brand" data-consent="all">Accept all</button>
+  </div>
+</section>

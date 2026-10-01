@@ -1,0 +1,76 @@
+<% layout("/layouts/boilerplate") %>
+<%
+  const stay = booking.listing;
+  const guest = booking.user;
+  const statusLabels = { PENDING: "Awaiting payment", PAID: "Paid", CONFIRMED: "Confirmed", FAILED: "Payment failed", CANCELLED: "Cancelled" };
+  const subtotal = booking.subtotal != null ? booking.subtotal : booking.amount;
+%>
+
+<div class="container-xl py-4">
+  <div class="no-print receipt-toolbar">
+    <a href="<%= viewerIsHost ? '/profile?tab=hosting' : '/profile?tab=trips' %>" class="small text-decoration-none">
+      <i class="fa-solid fa-arrow-left me-1" aria-hidden="true"></i><%= viewerIsHost ? "Reservations" : "Your trips" %>
+    </a>
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-quiet" data-print><i class="fa-solid fa-print me-2" aria-hidden="true"></i>Print or save as PDF</button>
+      <% if (stay) { %><a href="/listings/<%= stay._id %>" class="btn btn-brand">View listing</a><% } %>
+    </div>
+  </div>
+
+  <article class="surface receipt">
+    <header class="receipt-header">
+      <div>
+        <span class="brand mb-2"><span class="brand-mark" aria-hidden="true"><i class="fa-regular fa-compass"></i></span><span>Travel Roots</span></span>
+        <h1 class="h3 mt-3 mb-1"><%= viewerIsHost ? "Reservation details" : (["PAID", "CONFIRMED"].includes(booking.status) ? "Your stay is booked" : "Booking summary") %></h1>
+        <p class="text-muted mb-0">Reference <strong class="text-body"><%= booking._id.toString().slice(-8).toUpperCase() %></strong></p>
+      </div>
+      <div class="text-sm-end">
+        <span class="status-badge status-<%= booking.status %>"><%= statusLabels[booking.status] || booking.status %></span>
+        <% if (booking.paidAt) { %><div class="small text-muted mt-2">Paid on <%= helpers.formatDate(booking.paidAt) %></div><% } %>
+      </div>
+    </header>
+
+    <h2 class="h6 text-uppercase text-muted mb-3">Stay</h2>
+    <dl class="mb-4">
+      <dt>Listing</dt>
+      <dd><%= stay ? stay.title : "This listing is no longer available" %></dd>
+      <% if (stay) { %>
+      <dt>Location</dt>
+      <dd><%= helpers.placeName(stay.location, stay.country) %></dd>
+      <% } %>
+      <dt>Guest</dt>
+      <dd><%= guest ? (guest.displayName || guest.username) : "Former guest" %></dd>
+      <dt>Check-in</dt>
+      <dd><%= helpers.formatDate(booking.fromDate) %></dd>
+      <dt>Check-out</dt>
+      <dd><%= helpers.formatDate(booking.toDate) %></dd>
+      <dt>Nights</dt>
+      <dd><%= booking.nights %></dd>
+    </dl>
+
+    <h2 class="h6 text-uppercase text-muted mb-3">Payment</h2>
+    <div class="price-row"><span><%= booking.pricePerNight ? `${helpers.formatINR(booking.pricePerNight)} x ${booking.nights} nights` : "Accommodation" %></span><span><%= helpers.formatINR(subtotal) %></span></div>
+    <% if (booking.tax) { %>
+    <div class="price-row"><span>GST</span><span><%= helpers.formatINR(booking.tax) %></span></div>
+    <% } %>
+    <div class="price-row total"><span>Total paid (<%= booking.currency || "INR" %>)</span><span><%= helpers.formatINR(booking.amount) %></span></div>
+
+    <dl class="mt-4">
+      <% if (booking.paymentId) { %>
+      <dt>Transaction ID</dt>
+      <dd><code><%= booking.paymentId %></code></dd>
+      <% } %>
+      <dt>Booked on</dt>
+      <dd><%= helpers.formatDate(booking.createdAt) %></dd>
+      <% if (stay && stay.phone && !viewerIsHost) { %>
+      <dt>Host contact</dt>
+      <dd><%= stay.phone %> &middot; <%= stay.email %></dd>
+      <% } %>
+    </dl>
+
+    <p class="small text-muted mt-4 mb-0">
+      Payments are processed securely by Razorpay. For help with this booking contact
+      <a href="mailto:<%= supportEmail %>"><%= supportEmail %></a> and quote the reference above.
+    </p>
+  </article>
+</div>

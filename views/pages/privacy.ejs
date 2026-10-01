@@ -1,0 +1,122 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container-xl">
+  <article class="legal">
+    <span class="eyebrow">Legal</span>
+    <h1>Privacy Policy</h1>
+    <p class="text-muted">Last updated: <%= lastUpdated %></p>
+    <p>
+      Travel Roots ("Travel Roots", "we", "us") lets guests discover and book stays offered by hosts. This policy
+      explains what personal information we collect, why we collect it, who we share it with and the choices you
+      have. It applies to the Travel Roots website and related services.
+    </p>
+
+    <nav class="surface-alt legal-toc" aria-label="On this page">
+      <ol>
+        <li><a href="#collect">Information we collect</a></li>
+        <li><a href="#use">How we use information</a></li>
+        <li><a href="#bases">Legal bases</a></li>
+        <li><a href="#share">Who we share it with</a></li>
+        <li><a href="#transfers">International transfers</a></li>
+        <li><a href="#retention">How long we keep it</a></li>
+        <li><a href="#rights">Your rights and choices</a></li>
+        <li><a href="#security">Security</a></li>
+        <li><a href="#children">Children</a></li>
+        <li><a href="#changes">Changes and contact</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="collect">1. Information we collect</h2>
+    <p><strong>Information you give us</strong></p>
+    <ul>
+      <li><strong>Account details:</strong> username, email address and password. Passwords are stored only as a salted PBKDF2 hash and are never visible to us.</li>
+      <li><strong>Profile details:</strong> optional display name, phone number, location and a short bio.</li>
+      <li><strong>Listings:</strong> title, description, photos, location, nightly price and the contact phone number and email you provide for guests.</li>
+      <li><strong>Bookings:</strong> the stay you book, your dates, the amounts charged and the order and payment references returned by our payment provider.</li>
+      <li><strong>Reviews and saved stays:</strong> ratings, review text and the stays you add to your wishlist.</li>
+    </ul>
+    <p><strong>Information from third parties</strong></p>
+    <ul>
+      <li>If you sign in with <strong>Google</strong> or <strong>GitHub</strong>, we receive your provider ID, name, email address and profile photo.</li>
+      <li><strong>Razorpay</strong> tells us whether a payment succeeded. We never receive or store your card, UPI or bank details.</li>
+    </ul>
+    <p><strong>Information collected automatically</strong></p>
+    <ul>
+      <li>Technical data such as your IP address, browser type and the pages you request, recorded in server logs and used for security and rate limiting.</li>
+      <li>Cookies and local storage as described in our <a href="/cookies">Cookie Policy</a>.</li>
+    </ul>
+
+    <h2 id="use">2. How we use information</h2>
+    <ul>
+      <li>To create and manage your account and let you sign in.</li>
+      <li>To publish listings, show reviews and run search.</li>
+      <li>To process bookings and payments, and to show receipts to guests and reservations to hosts.</li>
+      <li>To keep the service secure, for example by limiting repeated sign-in attempts and verifying payments.</li>
+      <li>To send service messages such as password reset emails. We do not send marketing emails.</li>
+      <li>To comply with legal, tax and accounting obligations.</li>
+    </ul>
+
+    <h2 id="bases">3. Legal bases</h2>
+    <p>
+      Where data protection laws such as India's Digital Personal Data Protection Act, 2023 or the EU General Data
+      Protection Regulation apply, we process your information because it is necessary to provide the service you
+      asked for, because we have a legitimate interest in keeping the service secure and working well, because the
+      law requires it, or because you have given consent (for example, to preference storage). You can withdraw
+      consent at any time.
+    </p>
+
+    <h2 id="share">4. Who we share it with</h2>
+    <p>We do not sell your personal information. We share it only as needed to run Travel Roots:</p>
+    <ul>
+      <li><strong>Other users:</strong> your display name, photo and reviews are public. Hosts see the name of guests who book with them. Guests see the contact details a host adds to a listing.</li>
+      <li><strong>Razorpay</strong> processes payments.</li>
+      <li><strong>Cloudinary</strong> stores and delivers listing photos.</li>
+      <li><strong>MongoDB Atlas</strong> hosts our database and <strong>Render</strong> hosts the application.</li>
+      <li><strong>Geoapify</strong> converts a listing's location text into map coordinates. Only the location text is sent.</li>
+      <li><strong>Google</strong> and <strong>GitHub</strong>, if you choose to sign in with them.</li>
+      <li><strong>Email providers</strong> deliver password reset messages.</li>
+      <li><strong>Authorities</strong>, when we are legally required to, or to protect the rights and safety of our users.</li>
+    </ul>
+
+    <h2 id="transfers">5. International transfers</h2>
+    <p>
+      Our service providers may store or process information outside your country. When that happens we rely on
+      the safeguards these providers offer and on applicable law to protect your information.
+    </p>
+
+    <h2 id="retention">6. How long we keep it</h2>
+    <ul>
+      <li>Account, profile, listing and review data are kept until you delete them or delete your account.</li>
+      <li>Records of completed payments are retained for as long as tax and accounting laws require, even after an account is deleted, but are no longer linked to a profile.</li>
+      <li>Sessions expire 7 days after your last visit. Password reset links expire after one hour.</li>
+      <li>Server logs are kept for a limited period for security and troubleshooting.</li>
+    </ul>
+
+    <h2 id="rights">7. Your rights and choices</h2>
+    <ul>
+      <li><strong>Access and correction:</strong> view and update your details in <a href="/profile/settings">Account settings</a>.</li>
+      <li><strong>Deletion:</strong> delete your account at any time from Account settings. Listings, reviews and saved stays are removed immediately.</li>
+      <li><strong>Consent:</strong> change your cookie choices with the "Cookie settings" link in the footer.</li>
+      <li><strong>Other requests:</strong> to request a copy of your data, raise a concern or appoint a nominee, email us. You may also complain to your local data protection authority.</li>
+    </ul>
+
+    <h2 id="security">8. Security</h2>
+    <p>
+      We use HTTPS, hashed passwords, secure HttpOnly session cookies, protection against cross-site request
+      forgery, strict content security headers, rate limiting and server-side payment verification. No system is
+      completely secure, so please use a strong, unique password and tell us if you notice anything suspicious.
+    </p>
+
+    <h2 id="children">9. Children</h2>
+    <p>
+      Travel Roots is intended for people aged 18 and over. We do not knowingly collect information from children.
+      If you believe a child has created an account, contact us and we will remove it.
+    </p>
+
+    <h2 id="changes">10. Changes and contact</h2>
+    <p>
+      We will update this policy when our practices change and revise the date at the top. For any privacy question
+      or request, contact <a href="mailto:<%= supportEmail %>"><%= supportEmail %></a>.
+    </p>
+  </article>
+</div>

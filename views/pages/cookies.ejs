@@ -1,0 +1,128 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container-xl">
+  <article class="legal">
+    <span class="eyebrow">Legal</span>
+    <h1>Cookie Policy</h1>
+    <p class="text-muted">Last updated: <%= lastUpdated %></p>
+    <p>
+      This Cookie Policy explains how Travel Roots uses cookies and similar technologies when you visit our website,
+      what each one does, and how you can control them. It should be read together with our
+      <a href="/privacy">Privacy Policy</a>.
+    </p>
+
+    <nav class="surface-alt legal-toc" aria-label="On this page">
+      <ol>
+        <li><a href="#what">What cookies are</a></li>
+        <li><a href="#necessary">Strictly necessary cookies</a></li>
+        <li><a href="#preferences-storage">Preference storage</a></li>
+        <li><a href="#third-party">Third-party services</a></li>
+        <li><a href="#not-used">What we do not use</a></li>
+        <li><a href="#preferences">Manage your preferences</a></li>
+        <li><a href="#changes">Changes and contact</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="what">1. What cookies are</h2>
+    <p>
+      Cookies are small text files that a website stores in your browser. Similar technologies, such as the
+      browser's local storage, let a site remember information on your device. We use both only where they are
+      needed to run the service or where you have given permission.
+    </p>
+
+    <h2 id="necessary">2. Strictly necessary cookies</h2>
+    <p>
+      These cookies are essential for the website to work and to keep it secure. They cannot be switched off
+      because sign-in, form protection and checkout would stop working without them. They are set by Travel Roots
+      only.
+    </p>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr><th scope="col">Name</th><th scope="col">Purpose</th><th scope="col">Duration</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>tr.sid</code></td>
+            <td>
+              Identifies your session so you stay signed in. It also holds the security token that protects forms
+              against cross-site request forgery and short-lived on-screen messages. It is marked HttpOnly and, in
+              production, Secure, so scripts cannot read it and it is only sent over HTTPS. It is created only when it
+              is needed, for example when you open a form or sign in.
+            </td>
+            <td>Expires 7 days after your last visit</td>
+          </tr>
+          <tr>
+            <td><code>tr_consent</code></td>
+            <td>Records the choice you make in the cookie banner so we do not ask again on every page.</td>
+            <td>180 days</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="preferences-storage">3. Preference storage</h2>
+    <p>
+      If you choose "Accept all", or enable preferences below, we save the following display settings in your
+      browser's local storage. They never leave your device and are deleted as soon as you withdraw consent.
+    </p>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr><th scope="col">Key</th><th scope="col">Purpose</th><th scope="col">Duration</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>tr-theme</code></td><td>Remembers whether you prefer the light or dark theme.</td><td>Until you clear it or withdraw consent</td></tr>
+          <tr><td><code>tr-show-tax</code></td><td>Remembers whether prices are shown including GST.</td><td>Until you clear it or withdraw consent</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Without consent, these settings still work for the page you are on but are not remembered.</p>
+
+    <h2 id="third-party">4. Third-party services</h2>
+    <p>Some features load content from trusted providers. These providers may receive your IP address and may set
+      their own cookies on their own domains under their own policies:</p>
+    <ul>
+      <li><strong>Razorpay</strong> runs the secure payment window when you book a stay and may use cookies for fraud prevention and security.</li>
+      <li><strong>Google</strong> and <strong>GitHub</strong> are contacted only if you choose to sign in with them.</li>
+      <li><strong>OpenStreetMap</strong> supplies the map tiles on listing pages.</li>
+      <li><strong>Google Fonts</strong>, <strong>Cloudinary</strong> and <strong>Unsplash</strong> deliver fonts and images.</li>
+    </ul>
+
+    <h2 id="not-used">5. What we do not use</h2>
+    <p>
+      Travel Roots does not use advertising cookies, cross-site tracking, social media pixels or third-party
+      analytics. If this changes, we will update this policy and ask for your consent first.
+    </p>
+
+    <h2 id="preferences">6. Manage your preferences</h2>
+    <form id="cookiePreferencesForm" class="surface p-4 my-3">
+      <div class="form-check form-switch mb-3">
+        <input class="form-check-input" type="checkbox" role="switch" id="consentNecessary" checked disabled />
+        <label class="form-check-label" for="consentNecessary">
+          <strong>Strictly necessary</strong><br />
+          <span class="text-muted small">Always on. Required for sign-in, security and payments.</span>
+        </label>
+      </div>
+      <div class="form-check form-switch mb-4">
+        <input class="form-check-input" type="checkbox" role="switch" id="consentPreferences" />
+        <label class="form-check-label" for="consentPreferences">
+          <strong>Preferences</strong><br />
+          <span class="text-muted small">Remember your theme and tax display settings on this device.</span>
+        </label>
+      </div>
+      <button type="submit" class="btn btn-brand">Save preferences</button>
+      <span class="ms-2 text-success small" data-saved-notice hidden>Your preferences have been saved.</span>
+    </form>
+    <p>
+      You can also block or delete cookies in your browser settings. Blocking strictly necessary cookies will
+      prevent you from signing in and booking.
+    </p>
+
+    <h2 id="changes">7. Changes and contact</h2>
+    <p>
+      We may update this policy when we change how the website works. The date at the top shows when it was last
+      revised. Questions are welcome at <a href="mailto:<%= supportEmail %>"><%= supportEmail %></a>.
+    </p>
+  </article>
+</div>

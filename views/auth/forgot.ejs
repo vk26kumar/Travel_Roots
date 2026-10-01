@@ -1,0 +1,26 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container-xl">
+  <div class="surface narrow-card">
+    <span class="empty-state-icon"><i class="fa-solid fa-key" aria-hidden="true"></i></span>
+    <h1 class="h3">Forgot your password?</h1>
+    <p class="text-muted">Enter the email address on your account and we will send you a link to choose a new password.</p>
+
+    <% if (!features.email) { %>
+    <div class="alert alert-info small">
+      Email delivery is not configured on this server. Contact <a href="mailto:<%= supportEmail %>"><%= supportEmail %></a> for help signing in.
+    </div>
+    <% } %>
+
+    <form action="/forgot-password" method="POST" class="needs-validation" novalidate>
+      <input type="hidden" name="_csrf" value="<%= csrfToken() %>" />
+      <div class="mb-3">
+        <label for="forgotEmail" class="form-label">Email</label>
+        <input id="forgotEmail" name="email" type="email" class="form-control" autocomplete="email" maxlength="254" required />
+        <div class="invalid-feedback">Please enter a valid email address.</div>
+      </div>
+      <button type="submit" class="btn btn-brand w-100" data-loading-text="Sending...">Send reset link</button>
+    </form>
+    <p class="text-center small mt-4 mb-0"><a href="/login">Back to sign in</a></p>
+  </div>
+</div>
