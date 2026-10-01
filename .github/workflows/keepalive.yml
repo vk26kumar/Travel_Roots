@@ -1,0 +1,19 @@
+name: Keep alive
+
+# Render's free plan stops an idle service after 15 minutes, and the next
+# visitor waits up to a minute for it to start again. A light request every
+# ten minutes keeps the site responsive. Delete this workflow on a paid plan.
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Request the health endpoint
+        run: curl -fsS --max-time 90 --retry 2 https://travel-roots.onrender.com/healthz

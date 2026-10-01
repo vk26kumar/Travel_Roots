@@ -1,24 +1,33 @@
+# Dependency updates arrive once a month as a single grouped pull request per
+# ecosystem. Major versions are skipped because they need a manual migration;
+# security updates are still raised immediately by Dependabot security alerts.
 version: 2
 updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
-    open-pull-requests-limit: 10
+      interval: monthly
+    open-pull-requests-limit: 2
     groups:
-      production-dependencies:
-        dependency-type: production
+      npm-minor-and-patch:
         update-types: [minor, patch]
-      development-dependencies:
-        dependency-type: development
-        update-types: [minor, patch]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
+    groups:
+      github-actions:
+        patterns: ["*"]
 
   - package-ecosystem: docker
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
+    ignore:
+      # Stay on the Node.js LTS line; move to the next LTS manually.
+      - dependency-name: node
+        update-types: ["version-update:semver-major"]
