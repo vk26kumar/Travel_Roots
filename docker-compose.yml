@@ -1,0 +1,36 @@
+# Local stack: the application plus MongoDB.
+#   docker compose up --build
+# Optional integrations are read from .env when present.
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      NODE_ENV: production
+      ATLASDB_URL: mongodb://mongo:27017/travelroots
+      APP_URL: http://localhost:8080
+      SECRET: ${SECRET:-local-docker-secret-change-me-0123456789}
+      TRUST_PROXY: "0"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  mongo-data:
