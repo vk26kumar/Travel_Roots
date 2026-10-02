@@ -2,6 +2,20 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.2.0] - 2026-10-02
+
+### Added
+
+- A new logo: a map pin holding a sprouting seedling with its roots, used in the header, footer, receipts and as the browser tab icon, with PNG icons and a web app manifest.
+- The "Where travellers are going" section is now an interactive gallery: panels widen on hover or focus and rotate automatically, with a swipeable carousel on phones. Motion is disabled when the visitor prefers reduced motion.
+- `/readyz` reports the database round-trip time (`dbLatencyMs`) to help diagnose slow responses.
+- `DNS_SERVERS` setting for networks whose local DNS refuses the SRV lookups used by `mongodb+srv://` connection strings.
+- `npm run demo:watch` restarts the local demo when server code changes and keeps demo data between restarts.
+
+### Removed
+
+- Dependabot version updates. Dependencies are reviewed manually.
+
 ## [2.1.0] - 2026-10-02
 
 ### Changed
@@ -11,7 +25,7 @@ All notable changes to this project are documented in this file.
 - Replaced Font Awesome with an SVG icon sprite, Google Fonts with self-hosted variable fonts and the Bootstrap JavaScript bundle with a few lines of plain JavaScript.
 - Static assets are cached for a year using content-hashed URLs.
 - The listing page runs its queries in parallel and caches home page statistics.
-- Dependabot now opens one grouped pull request per ecosystem each month and skips major versions. The Docker image uses the Node.js 24 LTS release.
+- The Docker image uses the Node.js 24 LTS release.
 - Upgraded Joi to 18 and mongodb-memory-server to 11.
 
 ### Removed

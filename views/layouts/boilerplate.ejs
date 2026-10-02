@@ -16,7 +16,10 @@
     <% if (currUser) { %>
     <meta name="csrf-token" content="<%= csrfToken() %>" />
     <% } %>
-    <link rel="icon" href="/images/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="<%= helpers.asset('/images/favicon.svg') %>" type="image/svg+xml" />
+    <link rel="icon" href="<%= helpers.asset('/images/favicon-32.png') %>" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="<%= helpers.asset('/images/apple-touch-icon.png') %>" />
+    <link rel="manifest" href="/site.webmanifest" />
     <script src="<%= helpers.asset('/js/theme.js') %>"></script>
     <link rel="preload" href="/vendor/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/vendor/fonts/fraunces-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />

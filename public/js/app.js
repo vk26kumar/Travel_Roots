@@ -270,6 +270,93 @@
     }
   });
 
+  /* ---------- Destinations gallery ---------- */
+
+  var gallery = document.querySelector("[data-gallery]");
+  if (gallery) {
+    var panels = Array.prototype.slice.call(gallery.querySelectorAll("[data-gallery-item]"));
+    var INTERVAL = 5000;
+    var desktop = window.matchMedia("(min-width: 768px)");
+    var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    var activeIndex = 0;
+    var timer = null;
+    var inView = false;
+    var paused = false;
+
+    gallery.style.setProperty("--dest-interval", INTERVAL + "ms");
+
+    var activate = function (index) {
+      activeIndex = index;
+      panels.forEach(function (panel, n) {
+        panel.classList.toggle("is-active", n === index);
+      });
+    };
+
+    var stop = function () {
+      window.clearInterval(timer);
+      timer = null;
+      gallery.classList.remove("is-playing");
+    };
+
+    // Rotates only while visible, not hovered or focused, on wide screens, and
+    // when the visitor has not asked for reduced motion.
+    var sync = function () {
+      var shouldPlay =
+        inView && !paused && desktop.matches && !reducedMotion.matches && !document.hidden;
+      if (!shouldPlay) return stop();
+      if (timer) return undefined;
+      gallery.classList.add("is-playing");
+      timer = window.setInterval(function () {
+        activate((activeIndex + 1) % panels.length);
+      }, INTERVAL);
+      return undefined;
+    };
+
+    panels.forEach(function (panel, index) {
+      panel.addEventListener("mouseenter", function () {
+        activate(index);
+      });
+      panel.addEventListener("focus", function () {
+        activate(index);
+      });
+      // On touch screens the first tap opens a panel, the second follows the link.
+      panel.addEventListener("click", function (event) {
+        if (desktop.matches && !panel.classList.contains("is-active")) {
+          event.preventDefault();
+          activate(index);
+        }
+      });
+    });
+
+    var pause = function () {
+      paused = true;
+      sync();
+    };
+    var resume = function () {
+      paused = false;
+      sync();
+    };
+    gallery.addEventListener("mouseenter", pause);
+    gallery.addEventListener("mouseleave", resume);
+    gallery.addEventListener("focusin", pause);
+    gallery.addEventListener("focusout", resume);
+    document.addEventListener("visibilitychange", sync);
+    if (desktop.addEventListener) desktop.addEventListener("change", sync);
+
+    if ("IntersectionObserver" in window) {
+      new window.IntersectionObserver(
+        function (entries) {
+          inView = entries[0].isIntersecting;
+          sync();
+        },
+        { threshold: 0.35 },
+      ).observe(gallery);
+    } else {
+      inView = true;
+      sync();
+    }
+  }
+
   /* ---------- Wishlist ---------- */
 
   var csrfMeta = document.querySelector('meta[name="csrf-token"]');

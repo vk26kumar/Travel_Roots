@@ -155,19 +155,25 @@
       </div>
       <a href="#stays" class="link-arrow">Browse every stay <%- helpers.icon("arrow-right") %></a>
     </div>
-    <div class="destinations">
+    <div class="destinations" data-gallery>
       <% destinations.forEach((destination, index) => { %>
-      <a class="destination" href="/listings?search=<%= encodeURIComponent(destination._id) %>">
+      <a class="destination <%= index === 0 ? 'is-active' : '' %>" href="/listings?search=<%= encodeURIComponent(destination._id) %>" data-gallery-item>
         <img
-          src="<%= helpers.imageUrl(destination.image, index === 0 ? { width: 900, height: 1000 } : { width: 600, height: 450 }) %>"
+          src="<%= helpers.imageUrl(destination.image, { width: 900, height: 1100 }) %>"
+          srcset="<%= helpers.imageSrcset(destination.image, [600, 900], 9 / 11) %>"
+          sizes="(min-width: 768px) 45vw, 80vw"
           alt=""
           loading="lazy"
           decoding="async"
         />
-        <span class="destination-label">
+        <span class="destination-index"><%= String(index + 1).padStart(2, "0") %></span>
+        <span class="destination-spine" aria-hidden="true"><%= destination._id %></span>
+        <span class="destination-body">
           <strong><%= destination._id %></strong>
-          <span><%= destination.count %> <%= destination.count === 1 ? "stay" : "stays" %></span>
+          <span><%= destination.count %> <%= destination.count === 1 ? "stay" : "stays" %> to explore</span>
+          <span class="destination-cta">Explore stays <%- helpers.icon("arrow-right") %></span>
         </span>
+        <span class="destination-progress" aria-hidden="true"></span>
       </a>
       <% }) %>
     </div>

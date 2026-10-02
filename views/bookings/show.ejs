@@ -19,7 +19,7 @@
   <article class="surface receipt">
     <header class="receipt-head">
       <div>
-        <span class="brand"><span class="brand-mark" aria-hidden="true"><%- helpers.icon("sprout") %></span><span>Travel Roots</span></span>
+        <span class="brand"><img class="brand-logo" src="<%= helpers.asset('/images/logo.svg') %>" width="36" height="36" alt="" /><span>Travel Roots</span></span>
         <h1><%= viewerIsHost ? "Reservation details" : (isBooked ? "Your stay is booked" : "Booking summary") %></h1>
         <p class="text-muted mb-0">Reference <strong class="text-body"><%= booking._id.toString().slice(-8).toUpperCase() %></strong></p>
       </div>

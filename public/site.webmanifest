@@ -1,0 +1,14 @@
+{
+  "name": "Travel Roots",
+  "short_name": "Travel Roots",
+  "description": "Stays with a story, from hosts who know their place.",
+  "start_url": "/listings",
+  "display": "standalone",
+  "background_color": "#f7f4ee",
+  "theme_color": "#1f4d3a",
+  "icons": [
+    { "src": "/images/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/images/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/images/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

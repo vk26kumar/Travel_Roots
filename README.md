@@ -130,7 +130,7 @@ Key design decisions:
 |-- public/                   Static assets (CSS, JavaScript, images)
 |-- scripts/                  Database seed and migration scripts
 |-- tests/                    Unit and integration tests
-|-- .github/                  CI, CodeQL, deployment and Dependabot configuration
+|-- .github/                  CI, CodeQL, deployment and keep-alive workflows
 |-- Dockerfile                Production container image
 |-- docker-compose.yml        Local application and MongoDB stack
 `-- render.yaml               Render Blueprint
@@ -156,7 +156,7 @@ npm run seed                # optional: sample listings and a demo host account
 npm run dev                 # http://localhost:8080
 ```
 
-To try the application without any database setup, run `npm run demo`. It starts a temporary in-memory MongoDB with the sample listings and prints the demo host's sign-in details; the data is discarded when the process stops.
+To try the application without any database setup, run `npm run demo` (or `npm run demo:watch` while developing). It starts a private MongoDB instance with the sample listings, stores its data in `.data/demo-db` between runs and prints the demo host's sign-in details. Run `npm run demo -- --fresh` to start over. Template and stylesheet changes appear on refresh; server code changes restart `demo:watch` automatically.
 
 Only `ATLASDB_URL` and `SECRET` are needed to start. Each optional integration switches on when its variables are filled in.
 
@@ -194,6 +194,7 @@ All configuration is read from environment variables in `src/config/index.js`. A
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`          | For email         | SMTP server used for password reset emails                                |
 | `MAIL_FROM`                                                 | No                | Sender address for outgoing email                                         |
 | `SUPPORT_EMAIL`                                             | No                | Contact address shown in the footer, receipts and legal pages             |
+| `DNS_SERVERS`                                               | No                | Comma-separated DNS resolvers, for networks whose DNS refuses `mongodb+srv://` lookups (`querySrv ECONNREFUSED`) |
 | `LOG_LEVEL`                                                 | No                | `debug`, `info`, `warn`, `error` or `silent`                              |
 
 Configure the Razorpay webhook to send `payment.captured`, `order.paid` and `payment.failed` events to:
@@ -210,7 +211,8 @@ https://<your-domain>/webhook/razorpay
 | ----------------------- | ------------------------------------------------------------- |
 | `npm start`             | Start the server                                              |
 | `npm run dev`           | Start the server and restart on file changes                  |
-| `npm run demo`          | Run locally on a temporary in-memory database with sample listings (no MongoDB needed) |
+| `npm run demo`          | Run locally on a private demo database with sample listings (no MongoDB needed) |
+| `npm run demo:watch`    | Same as `demo`, restarting automatically when server code changes |
 | `npm test`              | Run unit and integration tests                                |
 | `npm run test:coverage` | Run tests with a coverage report                              |
 | `npm run lint`          | Lint with ESLint                                              |
@@ -251,7 +253,6 @@ Tests never read `.env`, so they cannot reach real payment, OAuth or storage acc
 | `ci.yml`     | Push and pull request to `main`  | Lint and format check, tests on Node 22 and 24 with MongoDB, production dependency audit, Docker build and container smoke test |
 | `codeql.yml` | Push, pull request and weekly    | GitHub CodeQL security analysis                                                                    |
 | `deploy.yml` | After CI succeeds on `main`      | Publishes the image to GitHub Container Registry, triggers the Render deploy hook and waits for `/healthz` |
-| Dependabot   | Monthly                          | One grouped pull request per ecosystem for minor and patch updates; major versions are skipped     |
 
 To enable continuous deployment:
 

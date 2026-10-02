@@ -66,7 +66,7 @@ function landingData() {
   });
 }
 
-async function popularDestinations(limit = 5) {
+async function popularDestinations(limit = 6) {
   return Listing.aggregate([
     { $sort: { ratingAverage: -1, _id: -1 } },
     {
