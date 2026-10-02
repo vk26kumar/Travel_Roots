@@ -1,6 +1,8 @@
 "use strict";
 
+const mongoose = require("mongoose");
 const Listing = require("../models/listing");
+const Review = require("../models/review");
 const Booking = require("../models/booking");
 const User = require("../models/user");
 const config = require("../config");
@@ -158,19 +160,91 @@ module.exports.renderNewForm = (req, res) => {
   res.render("listings/new", { title: "List your place", listing: null });
 };
 
+/**
+ * Loads a listing with its host, reviews (with authors) and similar stays in a
+ * single aggregation, so the page costs one database round trip instead of four.
+ */
+async function loadListingPage(id) {
+  const users = User.collection.name;
+  const [listing] = await Listing.aggregate([
+    { $match: { _id: new mongoose.Types.ObjectId(String(id)) } },
+    {
+      $lookup: {
+        from: users,
+        localField: "owner",
+        foreignField: "_id",
+        as: "owner",
+        pipeline: [
+          { $project: { username: 1, displayName: 1, profilePhoto: 1, createdAt: 1, bio: 1 } },
+        ],
+      },
+    },
+    { $set: { owner: { $first: "$owner" } } },
+    {
+      $lookup: {
+        from: Review.collection.name,
+        localField: "reviews",
+        foreignField: "_id",
+        as: "reviews",
+        pipeline: [
+          { $sort: { createdAt: -1 } },
+          {
+            $lookup: {
+              from: users,
+              localField: "author",
+              foreignField: "_id",
+              as: "author",
+              pipeline: [{ $project: { username: 1, displayName: 1, profilePhoto: 1 } }],
+            },
+          },
+          { $set: { author: { $first: "$author" } } },
+        ],
+      },
+    },
+    {
+      $lookup: {
+        from: Listing.collection.name,
+        let: { category: "$category", listingId: "$_id" },
+        as: "similar",
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [{ $eq: ["$category", "$$category"] }, { $ne: ["$_id", "$$listingId"] }],
+              },
+            },
+          },
+          { $sort: { ratingAverage: -1, _id: -1 } },
+          { $limit: 3 },
+          {
+            $project: {
+              title: 1,
+              price: 1,
+              location: 1,
+              country: 1,
+              image: 1,
+              category: 1,
+              ratingAverage: 1,
+              ratingCount: 1,
+            },
+          },
+        ],
+      },
+    },
+  ]);
+  return listing || null;
+}
+
 module.exports.showListing = async (req, res) => {
-  const listing = await Listing.findById(req.params.id)
-    .populate({
-      path: "reviews",
-      options: { sort: { createdAt: -1 } },
-      populate: { path: "author", select: "username displayName profilePhoto" },
-    })
-    .populate("owner", "username displayName profilePhoto createdAt bio");
+  const listing = await loadListingPage(req.params.id);
 
   if (!listing) {
     req.flash("error", "The listing you requested does not exist.");
     return res.redirect("/listings");
   }
+
+  listing.ratingAverage = listing.ratingAverage || 0;
+  listing.ratingCount = listing.ratingCount || 0;
 
   // Reviews whose author account was deleted are hidden rather than crashing the page.
   const reviews = listing.reviews.filter((review) => review.author);
@@ -178,20 +252,14 @@ module.exports.showListing = async (req, res) => {
   const isHost = Boolean(userId && listing.owner && listing.owner._id.equals(userId));
   const hasReviewed = Boolean(userId && reviews.some((review) => review.author._id.equals(userId)));
 
-  const similar = await Listing.find({ category: listing.category, _id: { $ne: listing._id } })
-    .sort({ ratingAverage: -1, _id: -1 })
-    .limit(3)
-    .select("title price location country image ratingAverage ratingCount")
-    .lean();
-
   return res.render("listings/show", {
     title: listing.title,
-    description: listing.description.slice(0, 160),
+    description: (listing.description || "").slice(0, 160),
     listing,
     reviews,
     isHost,
     hasReviewed,
-    similar,
+    similar: listing.similar,
     saved: wishlistIds(req.user),
   });
 };
@@ -266,22 +334,24 @@ module.exports.deleteListing = async (req, res) => {
 };
 
 module.exports.renderBookingForm = async (req, res) => {
-  const listing = await Listing.findById(req.params.id).populate("owner", "username displayName");
+  // Both lookups only need the id from the URL, so they run in parallel.
+  const [listing, unavailable] = await Promise.all([
+    Listing.findById(req.params.id).populate("owner", "username displayName"),
+    Booking.find({
+      listing: req.params.id,
+      status: { $in: ACTIVE_BOOKING_STATUSES },
+      toDate: { $gte: new Date() },
+    })
+      .sort({ fromDate: 1 })
+      .select("fromDate toDate")
+      .lean(),
+  ]);
   if (!listing) throw new ExpressError(404, "This listing no longer exists.");
 
   if (listing.owner && listing.owner._id.equals(req.user._id)) {
     req.flash("error", "You cannot book your own listing.");
     return res.redirect(`/listings/${listing._id}`);
   }
-
-  const unavailable = await Booking.find({
-    listing: listing._id,
-    status: { $in: ACTIVE_BOOKING_STATUSES },
-    toDate: { $gte: new Date() },
-  })
-    .sort({ fromDate: 1 })
-    .select("fromDate toDate")
-    .lean();
 
   return res.render("listings/book", {
     title: `Book ${listing.title}`,

@@ -11,7 +11,11 @@ const helpers = require("../src/utils/helpers");
 const { clean } = require("../src/middleware/sanitize");
 const config = require("../src/config");
 const payments = require("../src/services/payments");
-const { sessionStoreSecret, meetsStoreComplexity } = require("../src/config/session");
+const {
+  sessionStoreSecret,
+  meetsStoreComplexity,
+  CachedSessionStore,
+} = require("../src/config/session");
 const { testSecret, complexSecret, simpleSecret } = require("./fixtures");
 
 const NOW = new Date("2026-10-02T10:00:00Z");
@@ -164,5 +168,67 @@ describe("session store secret", () => {
     assert.ok(meetsStoreComplexity(sessionStoreSecret(weak)));
     assert.equal(sessionStoreSecret(weak), sessionStoreSecret(weak));
     assert.notEqual(sessionStoreSecret(weak), sessionStoreSecret(simpleSecret()));
+  });
+});
+
+describe("cached session store", () => {
+  function fakeStore() {
+    const data = new Map();
+    const calls = { get: 0, set: 0, touch: 0, destroy: 0 };
+    return {
+      calls,
+      get(sid, cb) {
+        calls.get += 1;
+        cb(null, data.has(sid) ? { ...data.get(sid), lastModified: new Date(0) } : null);
+      },
+      set(sid, sess, cb) {
+        calls.set += 1;
+        data.set(sid, sess);
+        cb(null);
+      },
+      touch(sid, sess, cb) {
+        calls.touch += 1;
+        cb(null);
+      },
+      destroy(sid, cb) {
+        calls.destroy += 1;
+        data.delete(sid);
+        cb(null);
+      },
+    };
+  }
+  const read = (store, sid) => new Promise((resolve) => store.get(sid, (e, s) => resolve(s)));
+  const future = () => new Date(Date.now() + 60000).toISOString();
+
+  it("serves reads from memory after a write and still persists the write", async () => {
+    const inner = fakeStore();
+    const store = new CachedSessionStore(inner);
+    store.set("a", { cookie: { expires: future() }, passport: { user: "u1" } }, () => {});
+    const session = await read(store, "a");
+    assert.equal(session.passport.user, "u1");
+    assert.ok(session.lastModified instanceof Date);
+    assert.equal(inner.calls.get, 0);
+    assert.equal(inner.calls.set, 1);
+  });
+
+  it("falls back to the database once and then caches", async () => {
+    const inner = fakeStore();
+    inner.set("b", { cookie: { expires: future() }, value: 1 }, () => {});
+    const store = new CachedSessionStore(inner);
+    await read(store, "b");
+    await read(store, "b");
+    assert.equal(inner.calls.get, 1);
+  });
+
+  it("ignores expired cached sessions and forgets destroyed ones", async () => {
+    const inner = fakeStore();
+    const store = new CachedSessionStore(inner);
+    store.set("c", { cookie: { expires: new Date(Date.now() - 1000).toISOString() } }, () => {});
+    await read(store, "c");
+    assert.equal(inner.calls.get, 1, "an expired entry is not served from memory");
+
+    store.set("d", { cookie: { expires: future() } }, () => {});
+    await new Promise((resolve) => store.destroy("d", resolve));
+    assert.equal(await read(store, "d"), null);
   });
 });

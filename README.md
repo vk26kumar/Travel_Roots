@@ -302,7 +302,11 @@ The home page downloads about 0.6 MB on a first visit, down from roughly 5 MB in
 - **Icons and fonts.** A single SVG sprite (about 5 KB compressed) replaces the Font Awesome icon fonts (about 300 KB). The Fraunces and Inter variable fonts are self-hosted, subset to Latin and preloaded, removing the Google Fonts round trips.
 - **JavaScript.** Bootstrap's JavaScript bundle is replaced by about 3 KB of plain JavaScript, and all scripts load with `defer`.
 - **Caching.** Every static URL carries a content hash (`?v=`), so assets are served with a one-year immutable cache header and still refresh instantly after a deploy.
-- **Server.** The listing page runs its database queries in parallel, and the home page statistics are cached in memory for five minutes and cleared when listings or reviews change. Responses are compressed.
+- **Server.** Every database round trip is expensive when the database is in another region, so the app makes as few as possible:
+  - Sessions are served from an in-memory cache that writes through to MongoDB in the background, and signed-in users are cached for a minute and invalidated on every write. Together this removes two round trips from every signed-in request.
+  - A listing page loads the listing, host, reviews with their authors and similar stays in one aggregation query instead of four sequential ones.
+  - Independent queries run in parallel, and home page statistics are cached for five minutes and cleared when listings or reviews change.
+- **Prefetching.** Chrome and Edge receive Speculation Rules, so a page starts loading when the visitor hovers a link. Pages with side effects, such as sign-out and checkout, are excluded.
 - **Cold starts.** Render's free plan stops idle services, which makes the next visit slow. The `keepalive.yml` workflow requests `/healthz` every ten minutes; remove it on a paid plan. For the lowest latency, run the Render service and the MongoDB Atlas cluster in the same region.
 
 ---

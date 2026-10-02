@@ -103,6 +103,8 @@ describe("authentication and profile", () => {
 
     const updated = await User.findById(user._id);
     assert.equal(updated.displayName, "Asha Rao");
+    // The signed-in user cache must reflect the change on the very next request.
+    assert.match((await agent.get("/profile")).text, /Asha Rao/);
     assert.equal(updated.username, credentials.username);
 
     const nextPassword = testPassword();

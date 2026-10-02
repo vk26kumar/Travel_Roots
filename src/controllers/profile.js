@@ -33,20 +33,25 @@ module.exports.showProfile = async (req, res) => {
   ]);
 
   const listingIds = listings.map((listing) => listing._id);
-  const reservations = listingIds.length
-    ? await Booking.find({ listing: { $in: listingIds }, status: { $in: ACTIVE_BOOKING_STATUSES } })
-        .populate("listing", "title")
-        .populate("user", "username displayName")
-        .sort({ fromDate: -1 })
-        .limit(50)
-        .lean()
-    : [];
-
   // Reviews only store their listing on newer documents; resolve titles for display.
   const reviewListingIds = reviews.map((review) => review.listing).filter(Boolean);
-  const reviewListings = await Listing.find({ _id: { $in: reviewListingIds } })
-    .select("title")
-    .lean();
+
+  // Both follow-up lookups depend only on the first batch, so they run together.
+  const [reservations, reviewListings] = await Promise.all([
+    listingIds.length
+      ? Booking.find({ listing: { $in: listingIds }, status: { $in: ACTIVE_BOOKING_STATUSES } })
+          .populate("listing", "title")
+          .populate("user", "username displayName")
+          .sort({ fromDate: -1 })
+          .limit(50)
+          .lean()
+      : [],
+    reviewListingIds.length
+      ? Listing.find({ _id: { $in: reviewListingIds } })
+          .select("title")
+          .lean()
+      : [],
+  ]);
   const titles = new Map(reviewListings.map((listing) => [listing._id.toString(), listing.title]));
 
   const isActive = (booking) => ACTIVE_BOOKING_STATUSES.includes(booking.status);

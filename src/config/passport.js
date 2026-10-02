@@ -5,6 +5,7 @@ const LocalStrategy = require("passport-local").Strategy;
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const GitHubStrategy = require("passport-github2").Strategy;
 const User = require("../models/user");
+const userCache = require("../utils/userCache");
 const config = require("./index");
 const logger = require("../utils/logger");
 
@@ -127,10 +128,14 @@ function configurePassport() {
 
   passport.deserializeUser(async (id, done) => {
     try {
+      // Served from memory when possible; see src/utils/userCache.js.
+      const cached = userCache.get(id);
+      if (cached) return done(null, cached);
       const user = await User.findById(id);
-      done(null, user || false);
+      if (user) userCache.set(id, user);
+      return done(null, user || false);
     } catch (error) {
-      done(error);
+      return done(error);
     }
   });
 

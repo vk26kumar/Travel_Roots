@@ -8,7 +8,11 @@
 const mongoose = require("mongoose");
 const { MongoStore } = require("connect-mongo");
 const config = require("./src/config");
-const { sessionStoreSecret, tolerateUnreadableSessions } = require("./src/config/session");
+const {
+  sessionStoreSecret,
+  tolerateUnreadableSessions,
+  CachedSessionStore,
+} = require("./src/config/session");
 const logger = require("./src/utils/logger");
 const { createApp } = require("./src/app");
 
@@ -19,14 +23,19 @@ async function start() {
   await mongoose.connect(config.db.url, { serverSelectionTimeoutMS: 10000 });
   logger.info("Connected to MongoDB");
 
-  const sessionStore = MongoStore.create({
+  const touchAfterSeconds = 24 * 3600;
+  const mongoStore = MongoStore.create({
     client: mongoose.connection.getClient(),
     crypto: { secret: sessionStoreSecret(config.session.secret) },
-    touchAfter: 24 * 3600,
+    touchAfter: touchAfterSeconds,
     ttl: config.session.maxAgeMs / 1000,
   });
-  sessionStore.on("error", (error) => logger.error("Session store error", error));
-  tolerateUnreadableSessions(sessionStore, logger);
+  mongoStore.on("error", (error) => logger.error("Session store error", error));
+  tolerateUnreadableSessions(mongoStore, logger);
+  const sessionStore = new CachedSessionStore(mongoStore, {
+    logger,
+    touchAfterMs: touchAfterSeconds * 1000,
+  });
 
   const app = createApp({ sessionStore });
   const server = app.listen(config.port, () => {

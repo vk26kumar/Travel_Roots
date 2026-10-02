@@ -2,6 +2,7 @@
 
 const mongoose = require("mongoose");
 const passportLocalMongoose = require("passport-local-mongoose");
+const userCache = require("../utils/userCache");
 
 const { Schema } = mongoose;
 
@@ -50,6 +51,24 @@ userSchema.plugin(passportLocalMongoose, {
 userSchema.virtual("name").get(function name() {
   return this.displayName || this.username;
 });
+
+// Keep the signed-in user cache consistent with every write to a user.
+userSchema.post("save", (doc) => userCache.invalidate(doc._id));
+userSchema.post("deleteOne", { document: true, query: false }, (doc) =>
+  userCache.invalidate(doc._id),
+);
+userSchema.post(
+  ["updateOne", "findOneAndUpdate", "findOneAndDelete", "deleteOne"],
+  { document: false, query: true },
+  function invalidateQueried() {
+    const id = this.getFilter()._id;
+    // A filter that is not a single id (for example { $in: [...] }) clears everything.
+    userCache.invalidate(
+      id && (typeof id === "string" || id instanceof mongoose.Types.ObjectId) ? id : null,
+    );
+  },
+);
+userSchema.post(["updateMany", "deleteMany"], () => userCache.invalidate(null));
 
 /** Whether the account has a local password (the hash field is not selected by default). */
 userSchema.statics.hasPassword = async function hasPassword(userId) {

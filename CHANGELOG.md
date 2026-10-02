@@ -18,6 +18,12 @@ All notable changes to this project are documented in this file.
 
 - Resolved all CodeQL findings: image host checks now compare exact hostnames instead of substrings, query inputs are explicitly reduced to strings before reaching MongoDB, the request sanitiser builds a fresh object instead of writing request-supplied keys, the payment webhook is rate limited, and the seed and demo scripts no longer print passwords.
 
+### Performance
+
+- Sessions are served from memory with write-through to MongoDB, and signed-in users are cached briefly with automatic invalidation, removing two database round trips from every signed-in request.
+- Listing pages load in a single aggregation query instead of four sequential ones; booking and profile pages run independent queries in parallel.
+- Hover prefetching through Speculation Rules in Chrome and Edge.
+
 ### Changed
 
 - `/healthz` reports the running version and deployed commit. The deploy workflow records a production deployment only when a Render deploy hook is configured, and succeeds only once the new commit is live.

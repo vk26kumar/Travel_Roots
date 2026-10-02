@@ -22,6 +22,7 @@ function readConsent(req) {
 
 /** Exposes view helpers and request-scoped values to every template. */
 function viewLocals(req, res, next) {
+  res.set("Speculation-Rules", '"/speculation-rules.json"');
   const flashSuccess = req.flash("success");
   const flashError = req.flash("error");
 

@@ -31,6 +31,36 @@ const profileRoutes = require("./routes/profile");
 
 const ROOT = path.join(__dirname, "..");
 
+const SPECULATION_RULES = JSON.stringify({
+  prefetch: [
+    {
+      where: {
+        and: [
+          { href_matches: "/*" },
+          {
+            not: {
+              href_matches: [
+                "/logout",
+                "/login",
+                "/signup",
+                "/forgot-password",
+                "/reset-password/*",
+                "/auth/*",
+                "/webhook/*",
+                "/bookings/*",
+                "/listings/*/book",
+                "/listings/new",
+              ],
+            },
+          },
+          { not: { selector_matches: "[data-no-prefetch], [target=_blank], [download]" } },
+        ],
+      },
+      eagerness: "moderate",
+    },
+  ],
+});
+
 /**
  * Builds the Express application.
  *
@@ -84,6 +114,13 @@ function createApp({ sessionStore } = {}) {
     "/vendor/fonts",
     express.static(vendor("@fontsource-variable/fraunces/files"), staticOptions),
   );
+
+  // Hover prefetching (Chrome and Edge): pages start loading before the click,
+  // hiding most of the server's response time. Pages with side effects are excluded.
+  app.get("/speculation-rules.json", (req, res) => {
+    res.set("Cache-Control", "public, max-age=86400");
+    res.type("application/speculationrules+json").send(SPECULATION_RULES);
+  });
 
   // Health probes and payment webhooks bypass sessions, CSRF and rate limiting.
   app.get("/healthz", pages.health);
