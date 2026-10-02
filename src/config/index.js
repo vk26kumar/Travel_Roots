@@ -24,6 +24,17 @@ if (env === "development") {
   }
 }
 
+// Some networks (VPN clients, local DNS proxies) refuse the SRV lookups that
+// mongodb+srv:// connection strings need. DNS_SERVERS=1.1.1.1,8.8.8.8 makes
+// Node use those resolvers instead of the system ones.
+if (process.env.DNS_SERVERS) {
+  require("dns").setServers(
+    process.env.DNS_SERVERS.split(",")
+      .map((server) => server.trim())
+      .filter(Boolean),
+  );
+}
+
 const isProduction = env === "production";
 const isTest = env === "test";
 

@@ -34,9 +34,22 @@ module.exports.health = (req, res) => {
   res.json({ status: "ok", uptime: Math.round(process.uptime()) });
 };
 
-/** Readiness probe: the database connection is available. */
-module.exports.ready = (req, res) => {
-  const connected = mongoose.connection.readyState === 1;
+/**
+ * Readiness probe: pings the database and reports the round trip in
+ * milliseconds. A value well above 50 ms usually means the web server and the
+ * database run in different regions.
+ */
+module.exports.ready = async (req, res) => {
   res.set("Cache-Control", "no-store");
-  res.status(connected ? 200 : 503).json({ status: connected ? "ready" : "unavailable" });
+  if (mongoose.connection.readyState !== 1) {
+    return res.status(503).json({ status: "unavailable" });
+  }
+  try {
+    const started = process.hrtime.bigint();
+    await mongoose.connection.db.admin().ping();
+    const dbLatencyMs = Number((process.hrtime.bigint() - started) / 1000000n);
+    return res.json({ status: "ready", dbLatencyMs });
+  } catch {
+    return res.status(503).json({ status: "unavailable" });
+  }
 };

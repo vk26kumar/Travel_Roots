@@ -6,6 +6,7 @@ npm-debug.log
 .git
 .github
 coverage
+.data
 tests
 *.md
 Dockerfile
