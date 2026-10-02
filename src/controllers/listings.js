@@ -82,7 +82,20 @@ function landingData() {
 
 async function popularDestinations(limit = 6) {
   return Listing.aggregate([
-    { $sort: { ratingAverage: -1, _id: -1 } },
+    // Cover photos come from real hosted images (Cloudinary or Unsplash); local
+    // placeholders such as the payment test listing are only used as a last resort.
+    {
+      $set: {
+        hasPhoto: {
+          $cond: [
+            { $regexMatch: { input: { $ifNull: ["$image.url", ""] }, regex: "^https://" } },
+            1,
+            0,
+          ],
+        },
+      },
+    },
+    { $sort: { hasPhoto: -1, ratingAverage: -1, _id: -1 } },
     {
       $group: {
         _id: "$country",

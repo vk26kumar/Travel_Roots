@@ -44,6 +44,24 @@ describe("listings, reviews and wishlist", () => {
     assert.match(injection.text, /<strong>0<\/strong> stays/);
   });
 
+  it("prefers real photos over local placeholders for destination covers", async () => {
+    const { user } = await h.signUp(app);
+    await h.createListing(user, {
+      country: "Bhutan",
+      image: { url: "https://images.unsplash.com/photo-real", filename: "listingimage" },
+    });
+    await h.createListing(user, {
+      country: "Bhutan",
+      title: "Test listing",
+      image: { url: "/images/test-listing.webp", filename: "listingimage" },
+    });
+    require("../src/controllers/listings").invalidateListingCache();
+    const home = await h.request(app).get("/listings");
+    const gallery = home.text.slice(home.text.indexOf("data-gallery"));
+    assert.match(gallery, /photo-real/);
+    assert.doesNotMatch(gallery.slice(0, gallery.indexOf("</a>")), /test-listing\.webp/);
+  });
+
   it("filters stays by price per night", async () => {
     const { user } = await h.signUp(app);
     await h.createListing(user, { title: "Budget Hut", price: 900 });
