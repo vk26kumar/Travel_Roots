@@ -21,10 +21,25 @@ jobs:
     name: Publish container image
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.sha.outputs.sha }}
+      hook-configured: ${{ steps.hook.outputs.configured }}
     steps:
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - id: sha
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - id: hook
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -n "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::RENDER_DEPLOY_HOOK_URL is not set, so no production deployment will be triggered."
+          fi
       - uses: docker/setup-buildx-action@v4
       - uses: docker/login-action@v4
         with:
@@ -47,9 +62,11 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+  # Only runs, and only records a production deployment, when a deploy hook is configured.
   deploy-render:
     name: Deploy to Render
     needs: publish-image
+    if: needs.publish-image.outputs.hook-configured == 'true'
     runs-on: ubuntu-latest
     environment:
       name: production
@@ -58,17 +75,19 @@ jobs:
       - name: Trigger Render deploy hook
         env:
           RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: curl -fsS -X POST "$RENDER_DEPLOY_HOOK_URL"
+      - name: Wait until the new commit is live
+        env:
+          EXPECTED: ${{ needs.publish-image.outputs.sha }}
         run: |
-          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
-            echo "RENDER_DEPLOY_HOOK_URL is not configured; skipping deployment."
-            exit 0
-          fi
-          curl -fsS -X POST "$RENDER_DEPLOY_HOOK_URL"
-      - name: Wait for the new release to become healthy
-        run: |
-          for attempt in $(seq 1 40); do
-            if curl -fsS https://travel-roots.onrender.com/healthz; then exit 0; fi
-            sleep 15
+          for attempt in $(seq 1 60); do
+            live=$(curl -fsS --max-time 30 https://travel-roots.onrender.com/healthz | sed -n 's/.*"commit":"\([0-9a-f]*\)".*/\1/p' || true)
+            if [ "$live" = "$EXPECTED" ]; then
+              echo "Commit $EXPECTED is live."
+              exit 0
+            fi
+            echo "Live commit: ${live:-unknown}; waiting for $EXPECTED"
+            sleep 20
           done
-          echo "The application did not report healthy in time."
+          echo "::error::The new commit did not go live within 20 minutes. Check the deploy logs in Render."
           exit 1

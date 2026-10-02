@@ -195,6 +195,7 @@ All configuration is read from environment variables in `src/config/index.js`. A
 | `MAIL_FROM`                                                 | No                | Sender address for outgoing email                                         |
 | `SUPPORT_EMAIL`                                             | No                | Contact address shown in the footer, receipts and legal pages             |
 | `DNS_SERVERS`                                               | No                | Comma-separated DNS resolvers, for networks whose DNS refuses `mongodb+srv://` lookups (`querySrv ECONNREFUSED`) |
+| `SEED_PASSWORD`                                             | No                | Password for the demo host account created by `npm run seed` and `npm run demo`; never printed |
 | `LOG_LEVEL`                                                 | No                | `debug`, `info`, `warn`, `error` or `silent`                              |
 
 Configure the Razorpay webhook to send `payment.captured`, `order.paid` and `payment.failed` events to:
@@ -260,6 +261,8 @@ To enable continuous deployment:
 2. In GitHub, add the URL as the repository secret `RENDER_DEPLOY_HOOK_URL`.
 3. Optionally create a `production` environment in GitHub to require approval before each deployment.
 
+Without the secret, the deploy workflow still publishes the container image but records no production deployment. With it, the workflow triggers Render and then waits until `/healthz` reports the exact commit that passed CI, so a green deployment always means the new code is live.
+
 ---
 
 ## Deployment
@@ -286,8 +289,8 @@ The image runs as a non-root user and includes a health check. Images built by t
 
 ### Health probes
 
-- `GET /healthz` returns `200` while the process is running (liveness).
-- `GET /readyz` returns `200` when the database is connected and `503` otherwise (readiness).
+- `GET /healthz` returns `200` while the process is running (liveness), with the running `version` and, on Render, the deployed git `commit`.
+- `GET /readyz` returns `200` when the database answers a ping and `503` otherwise (readiness). `dbLatencyMs` is the measured round trip; well above 50 ms usually means the server and database are in different regions.
 
 ---
 
