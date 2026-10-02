@@ -6,6 +6,7 @@ const Review = require("../models/review");
 const Booking = require("../models/booking");
 const { deleteImage } = require("../services/images");
 const { invalidateListingCache } = require("./listings");
+const { asString } = require("../utils/helpers");
 const { ACTIVE_BOOKING_STATUSES, BOOKING_STATUS } = require("../utils/constants");
 
 const TABS = ["trips", "saved", "listings", "hosting", "reviews"];
@@ -91,8 +92,12 @@ module.exports.renderSettings = async (req, res) => {
 };
 
 module.exports.updateProfile = async (req, res) => {
-  const { displayName, email, phone, location, bio } = req.body;
-  const normalisedEmail = email.toLowerCase();
+  // Joi has validated these as strings; asString keeps that guarantee explicit at the query.
+  const displayName = asString(req.body.displayName);
+  const phone = asString(req.body.phone);
+  const location = asString(req.body.location);
+  const bio = asString(req.body.bio);
+  const normalisedEmail = asString(req.body.email).toLowerCase();
 
   if (normalisedEmail !== req.user.email) {
     const taken = await User.exists({ email: normalisedEmail, _id: { $ne: req.user._id } });

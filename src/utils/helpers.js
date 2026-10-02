@@ -35,6 +35,14 @@ function safeRedirectPath(value, fallback = "/listings") {
   return value;
 }
 
+/**
+ * Returns the value only if it is a string. Used right before values reach a
+ * database query, so an object such as { "$ne": null } can never get through.
+ */
+function asString(value) {
+  return typeof value === "string" ? value : "";
+}
+
 /** Constant-time comparison of two strings. */
 function safeEqual(a, b) {
   if (typeof a !== "string" || typeof b !== "string") return false;
@@ -55,10 +63,28 @@ const PLACEHOLDER_IMAGE = "/images/placeholder.svg";
  * the browser never downloads a full-size original. Other URLs are returned
  * unchanged.
  */
+const UNSPLASH_HOSTS = new Set(["images.unsplash.com", "plus.unsplash.com"]);
+
+/** Identifies image hosts by exact hostname, never by substring. */
+function imageHost(url) {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:") return null;
+    if (parsed.hostname === "res.cloudinary.com" && parsed.pathname.includes("/upload/")) {
+      return "cloudinary";
+    }
+    if (UNSPLASH_HOSTS.has(parsed.hostname)) return "unsplash";
+  } catch {
+    // Not an absolute URL.
+  }
+  return null;
+}
+
 function imageUrl(url, { width = 800, height } = {}) {
   if (typeof url !== "string" || !url) return PLACEHOLDER_IMAGE;
+  const host = imageHost(url);
 
-  if (url.includes("res.cloudinary.com") && url.includes("/upload/")) {
+  if (host === "cloudinary") {
     const transforms = ["f_webp", "q_auto:eco", "c_fill", `w_${width}`];
     if (height) transforms.push(`h_${height}`);
     // Drop transformations added to previously generated URLs before applying new ones.
@@ -66,7 +92,7 @@ function imageUrl(url, { width = 800, height } = {}) {
     return original.replace("/upload/", `/upload/${transforms.join(",")}/`);
   }
 
-  if (/^https:\/\/(images|plus)\.unsplash\.com\//.test(url)) {
+  if (host === "unsplash") {
     const parsed = new URL(url);
     const params = new URLSearchParams({ w: String(width), q: "60", fm: "webp", fit: "crop" });
     if (height) params.set("h", String(height));
@@ -78,11 +104,7 @@ function imageUrl(url, { width = 800, height } = {}) {
 
 /** Builds a `srcset` for a resizable image at a fixed aspect ratio (width / height). */
 function imageSrcset(url, widths, aspect) {
-  const resizable =
-    typeof url === "string" &&
-    ((url.includes("res.cloudinary.com") && url.includes("/upload/")) ||
-      /^https:\/\/(images|plus)\.unsplash\.com\//.test(url));
-  if (!resizable) return "";
+  if (typeof url !== "string" || !imageHost(url)) return "";
   return widths
     .map((width) => `${imageUrl(url, { width, height: Math.round(width / aspect) })} ${width}w`)
     .join(", ");
@@ -151,6 +173,7 @@ module.exports = {
   clampInt,
   safeRedirectPath,
   safeEqual,
+  asString,
   sha256,
   imageUrl,
   imageSrcset,

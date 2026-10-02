@@ -1,6 +1,10 @@
 "use strict";
 
 const mongoose = require("mongoose");
+const { version } = require("../../package.json");
+
+// Render exposes the deployed commit; other hosts can set GIT_COMMIT.
+const commit = (process.env.RENDER_GIT_COMMIT || process.env.GIT_COMMIT || "").slice(0, 40);
 
 const LEGAL_LAST_UPDATED = "2 October 2026";
 
@@ -31,7 +35,12 @@ module.exports.cookies = (req, res) => {
 /** Liveness probe: the process is up and able to serve requests. */
 module.exports.health = (req, res) => {
   res.set("Cache-Control", "no-store");
-  res.json({ status: "ok", uptime: Math.round(process.uptime()) });
+  res.json({
+    status: "ok",
+    version,
+    commit: commit || undefined,
+    uptime: Math.round(process.uptime()),
+  });
 };
 
 /**

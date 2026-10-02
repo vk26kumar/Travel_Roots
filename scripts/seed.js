@@ -5,6 +5,7 @@
  *
  * Usage:
  *   npm run seed               Replace the demo host's listings only.
+ *   SEED_PASSWORD=...          Password for the demo host account when it is created.
  *   npm run seed -- --reset    Delete ALL listings, reviews and bookings first.
  *
  * Refuses to run against a production environment unless --force is given.
@@ -22,11 +23,15 @@ const sampleListings = require("./seed-data");
 const DEMO_USERNAME = "travelroots_host";
 const DEMO_EMAIL = "host@travelroots.app";
 
+/**
+ * The demo host's password comes from SEED_PASSWORD. Without it a random
+ * password is used and never shown, so no credential is ever logged.
+ */
 async function findOrCreateDemoHost() {
   const existing = await User.findOne({ username: DEMO_USERNAME });
-  if (existing) return { user: existing, password: null };
+  if (existing) return existing;
 
-  const password = process.env.SEED_PASSWORD || `Host-${crypto.randomBytes(6).toString("hex")}1`;
+  const password = process.env.SEED_PASSWORD || crypto.randomBytes(24).toString("base64url");
   const user = await User.register(
     new User({
       username: DEMO_USERNAME,
@@ -36,7 +41,7 @@ async function findOrCreateDemoHost() {
     }),
     password,
   );
-  return { user, password };
+  return user;
 }
 
 /** Inserts the sample listings. Expects an open Mongoose connection. */
@@ -46,7 +51,7 @@ async function seed({ reset = false } = {}) {
     console.log("Removed all listings, reviews and bookings.");
   }
 
-  const { user, password } = await findOrCreateDemoHost();
+  const user = await findOrCreateDemoHost();
   await Listing.deleteMany({ owner: user._id });
 
   const listings = sampleListings.map((listing) => ({
@@ -58,8 +63,10 @@ async function seed({ reset = false } = {}) {
   await Listing.insertMany(listings);
 
   console.log(`Inserted ${listings.length} listings owned by "${DEMO_USERNAME}".`);
-  if (password) console.log(`Demo host password: ${password}`);
-  return { username: DEMO_USERNAME, password };
+  if (!process.env.SEED_PASSWORD) {
+    console.log("Set SEED_PASSWORD before seeding to choose the demo host's password.");
+  }
+  return { username: DEMO_USERNAME };
 }
 
 async function main() {

@@ -83,6 +83,9 @@ describe("helpers", () => {
       "https://images.unsplash.com/photo-1?w=400&q=60&fm=webp&fit=crop&h=300",
     );
     assert.equal(helpers.imageUrl("https://example.com/x.jpg"), "https://example.com/x.jpg");
+    const spoofed = "https://evil.example/res.cloudinary.com/upload/v1/a.jpg";
+    assert.equal(helpers.imageUrl(spoofed), spoofed, "hostnames are matched exactly");
+    assert.equal(helpers.imageSrcset(spoofed, [400], 1), "");
     assert.equal(helpers.imageUrl(""), "/images/placeholder.svg");
     assert.match(
       helpers.imageSrcset("https://images.unsplash.com/photo-1", [400, 800], 4 / 3),
@@ -116,8 +119,16 @@ describe("request sanitising", () => {
     const body = JSON.parse(
       '{"listing":{"title":"ok","$where":"1","nested":{"a.b":1,"keep":2}},"__proto__":{"x":1}}',
     );
-    clean(body);
-    assert.deepEqual(body, { listing: { title: "ok", nested: { keep: 2 } } });
+    const cleaned = clean(body);
+    assert.deepEqual(cleaned, { listing: { title: "ok", nested: { keep: 2 } } });
+    assert.equal(Object.getPrototypeOf(cleaned), Object.prototype);
+    assert.notEqual(cleaned, body, "a new object is returned");
+  });
+
+  it("drops input nested beyond the depth limit", () => {
+    let deep = { $gt: 1 };
+    for (let i = 0; i < 15; i += 1) deep = { next: deep };
+    assert.ok(!JSON.stringify(clean(deep)).includes("$gt"));
   });
 });
 

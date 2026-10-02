@@ -7,6 +7,7 @@ const logger = require("../utils/logger");
 const ExpressError = require("../utils/ExpressError");
 const { validateStay, quote } = require("../services/pricing");
 const payments = require("../services/payments");
+const { asString } = require("../utils/helpers");
 const { BOOKING_STATUS, ACTIVE_BOOKING_STATUSES } = require("../utils/constants");
 
 /**
@@ -34,8 +35,8 @@ module.exports.createBooking = async (req, res) => {
     throw new ExpressError(503, "Online payments are not available right now.");
   }
 
-  const { listingId, checkIn, checkOut } = req.body;
-  const listing = await Listing.findById(listingId);
+  const { checkIn, checkOut } = req.body;
+  const listing = await Listing.findById(asString(req.body.listingId));
   if (!listing) throw new ExpressError(404, "This listing no longer exists.");
   if (listing.owner && listing.owner.equals(req.user._id)) {
     throw new ExpressError(400, "You cannot book your own listing.");
@@ -155,8 +156,10 @@ module.exports.razorpayWebhook = async (req, res) => {
     return res.status(400).json({ received: false, message: "Malformed payload" });
   }
 
-  const payment = event.payload && event.payload.payment && event.payload.payment.entity;
-  const orderId = payment && payment.order_id;
+  const payment = (event.payload && event.payload.payment && event.payload.payment.entity) || {};
+  // Even signed payloads are reduced to plain strings before they reach a query.
+  const orderId = asString(payment.order_id);
+  const paymentId = asString(payment.id);
 
   if (orderId && (event.event === "payment.captured" || event.event === "order.paid")) {
     await Booking.updateOne(
@@ -164,7 +167,7 @@ module.exports.razorpayWebhook = async (req, res) => {
         orderId,
         status: { $in: [BOOKING_STATUS.PENDING, BOOKING_STATUS.PAID, BOOKING_STATUS.CANCELLED] },
       },
-      { status: BOOKING_STATUS.CONFIRMED, paymentId: payment.id, paidAt: new Date() },
+      { status: BOOKING_STATUS.CONFIRMED, paymentId: paymentId || undefined, paidAt: new Date() },
     );
   } else if (orderId && event.event === "payment.failed") {
     await Booking.updateOne(

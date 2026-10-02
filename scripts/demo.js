@@ -4,7 +4,8 @@
  * Runs Travel Roots locally against a private MongoDB instance filled with the
  * sample listings, so nothing touches your real database. Data is kept in
  * .data/demo-db between runs; pass --fresh to start over. Other settings in
- * .env (Cloudinary, OAuth, Razorpay) are still used when present.
+ * .env (Cloudinary, OAuth, Razorpay) are still used when present. Set
+ * SEED_PASSWORD in .env to choose the demo host's password.
  *
  *   npm run demo            start the demo
  *   npm run demo:watch      restart automatically when server code changes
@@ -17,7 +18,6 @@ const { MongoMemoryServer } = require("mongodb-memory-server");
 
 const DATA_DIR = path.join(__dirname, "..", ".data");
 const DB_PATH = path.join(DATA_DIR, "demo-db");
-const LOGIN_FILE = path.join(DATA_DIR, "demo-login.txt");
 
 async function main() {
   if (process.argv.includes("--fresh")) fs.rmSync(DATA_DIR, { recursive: true, force: true });
@@ -34,18 +34,13 @@ async function main() {
   const { seed } = require("./seed");
 
   await mongoose.connect(process.env.ATLASDB_URL);
-  if ((await Listing.estimatedDocumentCount()) === 0) {
-    const { username, password } = await seed();
-    if (password) fs.writeFileSync(LOGIN_FILE, `${username}\n${password}\n`);
-  }
+  if ((await Listing.estimatedDocumentCount()) === 0) await seed();
   await mongoose.disconnect();
 
-  const [username, password] = fs.existsSync(LOGIN_FILE)
-    ? fs.readFileSync(LOGIN_FILE, "utf8").split("\n")
-    : ["travelroots_host", "(run with --fresh to create new demo data)"];
-
   console.log("\nDemo database ready in .data/demo-db (your real database is not used).");
-  console.log(`Sign in as "${username}" with password "${password}", or create a new account.\n`);
+  console.log(
+    'Sign in as "travelroots_host" with the SEED_PASSWORD from your .env, or create an account.\n',
+  );
 
   const stopDatabase = () => mongo.stop({ doCleanup: false }).catch(() => {});
   process.once("SIGINT", stopDatabase);
