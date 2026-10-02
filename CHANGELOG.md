@@ -6,8 +6,10 @@ All notable changes to this project are documented in this file.
 
 ### Added
 
-- A new logo: a map pin holding a sprouting seedling with its roots, used in the header, footer, receipts and as the browser tab icon, with PNG icons and a web app manifest.
+- A new logo: a destination map pin with a globe, reached by a dotted journey route, used in the header, footer, receipts and as the browser tab icon, with PNG icons and a web app manifest.
 - The "Where travellers are going" section is now an interactive gallery: panels widen on hover or focus and rotate automatically, with a swipeable carousel on phones. Motion is disabled when the visitor prefers reduced motion.
+- Price-per-night filter on the browse page, combined with search, category and sorting.
+- Share button on listing pages: the native share sheet on phones, copy link elsewhere.
 - `/readyz` reports the database round-trip time (`dbLatencyMs`) to help diagnose slow responses.
 - `DNS_SERVERS` setting for networks whose local DNS refuses the SRV lookups used by `mongodb+srv://` connection strings.
 - `npm run demo:watch` restarts the local demo when server code changes and keeps demo data between restarts.

@@ -270,6 +270,39 @@
     }
   });
 
+  /* ---------- Share ---------- */
+
+  each("[data-share]", function (button) {
+    var label = button.querySelector("[data-share-label]");
+    var showCopied = function () {
+      if (!label) return;
+      label.textContent = "Link copied";
+      window.setTimeout(function () {
+        label.textContent = "Share";
+      }, 2500);
+    };
+
+    button.addEventListener("click", function () {
+      var url = window.location.origin + window.location.pathname;
+      var data = {
+        title: button.getAttribute("data-share-title") || document.title,
+        text: button.getAttribute("data-share-text") || "",
+        url: url,
+      };
+      if (navigator.share) {
+        navigator.share(data).catch(function () {
+          /* The visitor closed the share sheet. */
+        });
+      } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(showCopied, function () {
+          window.prompt("Copy this link:", url);
+        });
+      } else {
+        window.prompt("Copy this link:", url);
+      }
+    });
+  });
+
   /* ---------- Destinations gallery ---------- */
 
   var gallery = document.querySelector("[data-gallery]");

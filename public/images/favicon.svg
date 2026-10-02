@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <title>Travel Roots</title>
   <rect width="64" height="64" rx="18" fill="#1f4d3a"/>
-  <path d="M32 59.5c-7.3-8.3-18-18.8-18-32a18 18 0 0 1 36 0c0 13.2-10.7 23.7-18 32Z" fill="#f7f4ee"/>
-  <path d="M32 33.5V22.8" fill="none" stroke="#1f4d3a" stroke-width="2.6" stroke-linecap="round"/>
-  <path d="M32 27c-6.2 0-10-3.6-10-9.1 5.9 0 10 3.1 10 9.1Z" fill="#1f4d3a"/>
-  <path d="M32 24.1c0-6.3 3.7-10.2 10-10.2 0 6-3.9 10.2-10 10.2Z" fill="#2f7a59"/>
-  <path d="M22.5 33.5h19" fill="none" stroke="#b4532c" stroke-width="2.6" stroke-linecap="round"/>
-  <path d="M32 33.5v9.5M32 36c-1.2 2.6-3.2 4.4-6 5.6M32 36c1.2 2.6 3.2 4.4 6 5.6M28.6 39.2c-.4 1.6-1.4 2.9-2.9 3.9M35.4 39.2c.4 1.6 1.4 2.9 2.9 3.9" fill="none" stroke="#b4532c" stroke-width="2" stroke-linecap="round"/>
+  <path d="M9 55c6.7-1 9.9-6.9 15.6-9 4.4-1.6 8.4.4 11.8-1" fill="none" stroke="#e08a62" stroke-width="3" stroke-linecap="round" stroke-dasharray="0.1 5.4"/>
+  <path d="M39.5 51.5c-6.2-7-15-15.9-15-26.8a15 15 0 0 1 30 0c0 10.9-8.8 19.8-15 26.8Z" fill="#f7f4ee"/>
+  <g fill="none" stroke="#1f4d3a" stroke-width="2" stroke-linecap="round">
+    <circle cx="39.5" cy="24.7" r="8.6"/>
+    <path d="M30.9 24.7h17.2M39.5 16.1c-2.6 2.4-3.9 5.3-3.9 8.6s1.3 6.2 3.9 8.6c2.6-2.4 3.9-5.3 3.9-8.6s-1.3-6.2-3.9-8.6Z"/>
+  </g>
 </svg>

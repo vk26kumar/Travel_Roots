@@ -34,8 +34,8 @@ Live site: https://travel-roots.onrender.com
 
 ### Guests
 
-- Browse stays with server-side search (city, country or title), category filters, sorting and pagination.
-- Listing pages with photo, host details, interactive map, rating summary and similar stays.
+- Browse stays with server-side search (city, country or title), category and price-per-night filters, sorting and pagination.
+- Listing pages with photo, host details, interactive map, rating summary, similar stays and a share button (native share sheet on phones, copy link on desktop).
 - Wishlist: save and remove stays with one click and view them in the profile.
 - Booking flow with date validation, availability checks, GST breakdown and Razorpay Checkout.
 - Printable receipts for every booking.

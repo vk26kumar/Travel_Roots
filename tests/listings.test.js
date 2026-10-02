@@ -44,6 +44,23 @@ describe("listings, reviews and wishlist", () => {
     assert.match(injection.text, /<strong>0<\/strong> stays/);
   });
 
+  it("filters stays by price per night", async () => {
+    const { user } = await h.signUp(app);
+    await h.createListing(user, { title: "Budget Hut", price: 900 });
+    await h.createListing(user, { title: "Mid Cabin", price: 2500 });
+    await h.createListing(user, { title: "Luxury Villa", price: 9000 });
+
+    const range = await h.request(app).get("/listings?minPrice=1000&maxPrice=5000");
+    assert.match(range.text, /Mid Cabin/);
+    assert.doesNotMatch(range.text, /Budget Hut|Luxury Villa/);
+
+    const swapped = await h.request(app).get("/listings?minPrice=5000&maxPrice=1000");
+    assert.match(swapped.text, /Mid Cabin/);
+
+    const ignored = await h.request(app).get("/listings?minPrice=abc&maxPrice=-5");
+    assert.match(ignored.text, /<strong>3<\/strong> stays/);
+  });
+
   it("creates a listing through the upload form with validation", async () => {
     const { agent, user } = await h.signUp(app);
     const token = h.extractCsrf((await agent.get("/listings/new")).text);

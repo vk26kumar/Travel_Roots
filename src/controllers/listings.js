@@ -20,14 +20,26 @@ function wishlistIds(user) {
   return new Set(user ? user.wishlist.map((id) => id.toString()) : []);
 }
 
+/** Parses an optional whole-rupee price from the query string, or returns null. */
+function priceParam(value) {
+  const text = queryString(value, 10);
+  if (!/^\d+$/.test(text)) return null;
+  return Math.min(Number(text), 1000000);
+}
+
 /** Builds the Mongo filter for the browse page from validated query input. */
-function buildFilter({ search, category }) {
+function buildFilter({ search, category, minPrice, maxPrice }) {
   const filter = {};
   if (search) {
     const pattern = new RegExp(escapeRegex(search), "i");
     filter.$or = [{ location: pattern }, { country: pattern }, { title: pattern }];
   }
   if (category) filter.category = category;
+  if (minPrice !== null || maxPrice !== null) {
+    filter.price = {};
+    if (minPrice !== null) filter.price.$gte = minPrice;
+    if (maxPrice !== null) filter.price.$lte = maxPrice;
+  }
   return filter;
 }
 
@@ -89,10 +101,16 @@ module.exports.index = async (req, res) => {
   const sortKey = SORT_OPTIONS[queryString(req.query.sort)]
     ? queryString(req.query.sort)
     : "recommended";
-  const filter = buildFilter({ search, category });
+  let minPrice = priceParam(req.query.minPrice);
+  let maxPrice = priceParam(req.query.maxPrice);
+  if (minPrice !== null && maxPrice !== null && minPrice > maxPrice) {
+    [minPrice, maxPrice] = [maxPrice, minPrice];
+  }
+  const filter = buildFilter({ search, category, minPrice, maxPrice });
+  const hasPriceFilter = minPrice !== null || maxPrice !== null;
 
   const page = clampInt(req.query.page, { min: 1, max: 1000, fallback: 1 });
-  const isLanding = !search && !category && page === 1;
+  const isLanding = !search && !category && !hasPriceFilter && page === 1;
 
   // Independent queries run in parallel so the page costs one database round trip.
   const [total, listings, landing] = await Promise.all([
@@ -123,6 +141,9 @@ module.exports.index = async (req, res) => {
     totalPages,
     search,
     category,
+    minPrice,
+    maxPrice,
+    hasPriceFilter,
     sortKey,
     sortOptions: SORT_OPTIONS,
     isLanding,

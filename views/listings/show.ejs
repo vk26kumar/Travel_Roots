@@ -27,11 +27,16 @@
           <span><%= listing.category %></span>
         </div>
       </div>
-      <% if (currUser && !isHost) { %>
-      <button type="button" class="btn btn-outline save-toggle" data-wishlist-id="<%= listingId %>" aria-pressed="<%= isSaved ? 'true' : 'false' %>" aria-label="<%= isSaved ? 'Remove from saved stays' : 'Save to wishlist' %>">
-        <%- helpers.icon("heart", { className: "icon-heart" }) %><span data-wishlist-label><%= isSaved ? "Saved" : "Save" %></span>
-      </button>
-      <% } %>
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-outline" data-share data-share-title="<%= listing.title %> | Travel Roots" data-share-text="<%= listing.title %> in <%= place %>">
+          <%- helpers.icon("share") %><span data-share-label>Share</span>
+        </button>
+        <% if (currUser && !isHost) { %>
+        <button type="button" class="btn btn-outline save-toggle" data-wishlist-id="<%= listingId %>" aria-pressed="<%= isSaved ? 'true' : 'false' %>" aria-label="<%= isSaved ? 'Remove from saved stays' : 'Save to wishlist' %>">
+          <%- helpers.icon("heart", { className: "icon-heart" }) %><span data-wishlist-label><%= isSaved ? "Saved" : "Save" %></span>
+        </button>
+        <% } %>
+      </div>
     </div>
   </header>
 

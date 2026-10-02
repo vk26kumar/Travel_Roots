@@ -2,9 +2,12 @@
 <%
   const buildQuery = (overrides) => {
     const params = new URLSearchParams();
-    const values = Object.assign({ search, category, sort: sortKey === "recommended" ? "" : sortKey }, overrides);
+    const values = Object.assign(
+      { search, category, minPrice, maxPrice, sort: sortKey === "recommended" ? "" : sortKey },
+      overrides,
+    );
     for (const [key, value] of Object.entries(values)) {
-      if (value) params.set(key, value);
+      if (value !== null && value !== undefined && value !== "") params.set(key, value);
     }
     const query = params.toString();
     return query ? `/listings?${query}` : "/listings";
@@ -73,7 +76,7 @@
   <section class="page-intro">
     <a href="/listings" class="back-link"><%- helpers.icon("arrow-left") %>All stays</a>
     <h1>
-      <% if (search && category) { %><%= category %> stays matching "<%= search %>"<% } else if (search) { %>Stays matching "<%= search %>"<% } else if (category) { %><%= category %> stays<% } else { %>All stays<% } %>
+      <% if (search && category) { %><%= category %> stays matching "<%= search %>"<% } else if (search) { %>Stays matching "<%= search %>"<% } else if (category) { %><%= category %> stays<% } else if (hasPriceFilter) { %>Stays in your budget<% } else { %>All stays<% } %>
     </h1>
   </section>
   <% } %>
@@ -92,25 +95,34 @@
   <div class="toolbar">
     <p class="result-count" aria-live="polite">
       <strong><%= total %></strong> <%= total === 1 ? "stay" : "stays" %>
-      <% if (search || category) { %>&middot; <a href="/listings">Clear filters</a><% } %>
+      <% if (hasPriceFilter) { %>&middot; <%= minPrice !== null ? helpers.formatINR(minPrice) : "Any" %> to <%= maxPrice !== null ? helpers.formatINR(maxPrice) : "any" %> per night<% } %>
+      <% if (search || category || hasPriceFilter) { %>&middot; <a href="/listings">Clear filters</a><% } %>
     </p>
-    <div class="d-flex flex-wrap align-items-center gap-3">
-      <div class="form-check form-switch mb-0">
-        <input class="form-check-input" type="checkbox" role="switch" id="taxToggle" />
-        <label class="form-check-label small" for="taxToggle">Prices incl. GST</label>
-      </div>
-      <form method="GET" action="/listings" class="d-flex align-items-center gap-2">
-        <% if (search) { %><input type="hidden" name="search" value="<%= search %>" /><% } %>
-        <% if (category) { %><input type="hidden" name="category" value="<%= category %>" /><% } %>
+    <form method="GET" action="/listings" class="filters" aria-label="Filter and sort stays">
+      <% if (search) { %><input type="hidden" name="search" value="<%= search %>" /><% } %>
+      <% if (category) { %><input type="hidden" name="category" value="<%= category %>" /><% } %>
+      <fieldset class="price-range">
+        <legend class="small text-muted">Price per night</legend>
+        <label class="visually-hidden" for="minPrice">Minimum price per night</label>
+        <input id="minPrice" name="minPrice" type="number" inputmode="numeric" min="0" max="1000000" step="100" class="form-control" placeholder="Min" value="<%= minPrice !== null ? minPrice : '' %>" />
+        <span class="text-muted" aria-hidden="true">to</span>
+        <label class="visually-hidden" for="maxPrice">Maximum price per night</label>
+        <input id="maxPrice" name="maxPrice" type="number" inputmode="numeric" min="0" max="1000000" step="100" class="form-control" placeholder="Max" value="<%= maxPrice !== null ? maxPrice : '' %>" />
+        <button class="btn btn-sm btn-outline" type="submit">Apply</button>
+      </fieldset>
+      <div class="d-flex align-items-center gap-2">
         <label for="sortSelect" class="small text-muted text-nowrap">Sort</label>
         <select id="sortSelect" name="sort" class="form-select" data-auto-submit>
           <% for (const [key, option] of Object.entries(sortOptions)) { %>
           <option value="<%= key %>" <%= key === sortKey ? "selected" : "" %>><%= option.label %></option>
           <% } %>
         </select>
-        <noscript><button class="btn btn-sm btn-outline" type="submit">Apply</button></noscript>
-      </form>
-    </div>
+      </div>
+      <div class="form-check form-switch mb-0">
+        <input class="form-check-input" type="checkbox" role="switch" id="taxToggle" />
+        <label class="form-check-label small" for="taxToggle">Incl. GST</label>
+      </div>
+    </form>
   </div>
 
   <% if (listings.length) { %>
